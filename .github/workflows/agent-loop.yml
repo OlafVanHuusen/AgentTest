@@ -2,7 +2,10 @@
 # Autonomous Agent Loop
 #
 # Three agents collaborate:
-#   1. PO Agent     – scans .md plans for unchecked tasks → creates issues
+#   1. PO Agent     – reads PHASE*.md docs, converts each section into a
+#                     GitHub issue with full context, then deletes the .md
+#                     so tasks are never duplicated. When no .md plans remain,
+#                     writes suggestions.txt with project status & ideas.
 #   2. Writer Agent – picks an open issue, implements it in a branch, opens PR
 #   3. Reviewer Agent – reviews PRs, runs tests, approves/requests changes
 #
@@ -36,16 +39,19 @@ concurrency:
 
 jobs:
   # ═══════════════════════════════════════════════
-  #  PO AGENT – backlog scanner
+  #  PO AGENT – reads .md plans, creates tickets,
+  #  removes converted tasks from .md files
   # ═══════════════════════════════════════════════
   po-agent:
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write          # needs write to commit .md removals
       issues: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -54,6 +60,11 @@ jobs:
 
       - name: Install OpenCode
         run: npm install -g opencode-ai
+
+      - name: Configure Git
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
       - name: Run PO Agent
         env:
@@ -64,38 +75,133 @@ jobs:
           opencode -m "$OPENCODE_MODEL" run "
           You are the **PO (Product Owner) Agent** for the Timeloop Bus project.
 
-          ## Your mission
-          Scan every Markdown plan file in this repository and turn unchecked
-          tasks into GitHub Issues so the Writer Agent can pick them up.
+          Your single mission: convert every task in the PHASE*.md plan files
+          into GitHub issues, then **remove the converted content** from the
+          .md files so tasks are never duplicated.
 
-          ## Step-by-step instructions
-          1. Read **all** .md files in the repo root: IMPLEMENTATION_PLAN.md,
-             PHASE1_Foundation.md, PHASE2_Visuals.md, PHASE3_LLM_Core.md,
-             PHASE4_Game_Logic.md, PHASE5_Polish.md, PHASE6_Web_Export.md.
-          2. Extract every line that contains an unchecked checkbox \`- [ ]\`.
-          3. For each unchecked task, derive a short but descriptive issue title
-             and include the phase name (e.g. 'Phase 1 – 1.1 Create directory
-             structure').
-          4. Run \`gh issue list --label task --state open --json title --jq '.[].title'\`
-             to get the list of existing open issues.
-          5. **Skip** any task that already has a matching open issue (compare by
-             title similarity — do not create duplicates).
-          6. For each **new** task, run:
-             \`\`\`
-             gh issue create \\
-               --title \"<phase> – <task title>\" \\
-               --body \"From: <filename>\\n\\nTask: <full checkbox line>\\n\\nPhase context: <brief description>\" \\
-               --label task
-             \`\`\`
-          7. After processing all files, print a summary table:
-             | Status | Title |
-             |--------|-------|
-             | created / skipped (dup) | … |
+          ─────────────────────────────────────────────
+          ## STEP 1 — Check for PHASE*.md files
+          ─────────────────────────────────────────────
+          1. Run \`ls PHASE*.md 2>/dev/null\` to see which phase files exist.
+          2. If **no** PHASE*.md files exist at all, skip to **STEP 5**
+             (suggestions mode).
 
-          ## Important rules
-          - Never create duplicate issues.
-          - Respect the order: Phase 1 tasks first, then Phase 2, etc.
-          - If zero new tasks are found, say so and exit cleanly.
+          ─────────────────────────────────────────────
+          ## STEP 2 — Read each PHASE file completely
+          ─────────────────────────────────────────────
+          For every PHASE*.md file that exists, read its **entire** content
+          with \`cat <filename>\`.
+
+          Parse the file to extract:
+          - The **phase number** (from filename, e.g. PHASE3 → 3).
+          - The **phase title** (the first H1 heading, e.g. 'LLM Core').
+          - Every **section heading** (### lines like '### 3.1 LLM Base Interface').
+          - Every **task line** — lines matching \`- [ ]\` (unchecked checkbox).
+            Also include the surrounding context: any code blocks, bullet points,
+            or descriptions that belong to that task/section.
+
+          Group the tasks by section. Each section becomes **one GitHub issue**.
+
+          ─────────────────────────────────────────────
+          ## STEP 3 — Create GitHub issues
+          ─────────────────────────────────────────────
+          For each **section** (e.g. '### 3.2 Ollama Client') create ONE issue:
+
+          **Title format:**
+          \`Phase <N>.<S> – <section title>\`
+          Example: \`Phase 3.2 – Ollama Client\`
+
+          **Body format (Markdown):**
+          \`\`\`
+          ## Source
+          File: \`<PHASE filename>\`
+          Phase: <phase title>
+
+          ## Tasks
+          <paste ALL the checkbox lines from that section, verbatim>
+
+          ## Context
+          <paste any code blocks, descriptions, or notes that appeared
+           under that section heading — everything the Writer Agent
+           needs to implement it>
+
+          ## Acceptance Criteria
+          - All checkbox items above are implemented
+          - Code compiles (\`python -m py_compile\`)
+          - Follows project structure (game/, llm/, lore/, assets/)
+          \`\`\`
+
+          Create the issue with:
+          \`\`\`
+          gh issue create \\
+            --title \"<title>\" \\
+            --body \"<body>\" \\
+            --label task
+          \`\`\`
+
+          **Important**: Before creating, check for duplicates:
+          \`\`\`
+          gh issue list --label task --state all --limit 500 --json number,title
+          \`\`\`
+          Skip any section whose title already matches an existing issue
+          (open OR closed). Match by key words, ignore punctuation.
+
+          ─────────────────────────────────────────────
+          ## STEP 4 — Remove converted content from .md
+          ─────────────────────────────────────────────
+          After ALL issues for a PHASE file have been created (or skipped
+          because they already exist), **delete the PHASE*.md file entirely**:
+
+          \`\`\`
+          git rm <filename>
+          \`\`\`
+
+          Once all PHASE files are processed:
+          \`\`\`
+          git add -A
+          git commit -m 'chore: convert PHASE docs to issues and remove processed files'
+          git push origin main
+          \`\`\`
+
+          This ensures the same tasks are never converted twice.
+
+          Also update IMPLEMENTATION_PLAN.md — if it contains an
+          'Implementation Phases' section with \`- [ ]\` checkboxes that
+          mirror the PHASE files, remove that section too (but keep the
+          rest of the file). Commit this change in the same commit.
+
+          ─────────────────────────────────────────────
+          ## STEP 5 — No .md plans? Write suggestions
+          ─────────────────────────────────────────────
+          If **no** PHASE*.md files were found in Step 1:
+          1. List all open issues: \`gh issue list --label task --state open --limit 500 --json number,title\`
+          2. List all closed issues: \`gh issue list --label task --state closed --limit 500 --json number,title\`
+          3. Read IMPLEMENTATION_PLAN.md (if it exists) for project context.
+          4. Based on what is done vs. remaining, write a file called
+             \`suggestions.txt\` in the repo root with:
+             - A summary of project progress (issues closed vs open).
+             - Suggested next priorities or improvements.
+             - Any gaps you notice (e.g. missing tests, missing docs).
+             - Ideas for new features beyond the original plan.
+          5. Commit and push:
+             \`\`\`
+             git add suggestions.txt
+             git commit -m 'chore: update suggestions.txt with project status and ideas'
+             git push origin main
+             \`\`\`
+
+          ─────────────────────────────────────────────
+          ## Rules
+          ─────────────────────────────────────────────
+          - **ONE issue per section** (### heading), NOT one issue per checkbox line.
+            Each issue bundles all tasks under that section.
+          - Include FULL context in the issue body — code examples, expected
+            output, questions — so the Writer Agent has everything it needs.
+          - Never create duplicate issues. Always check existing issues first.
+          - Always commit and push your .md removals so they don't get
+            re-processed on the next run.
+          - Print a final summary: files processed, issues created, issues
+            skipped (duplicate), files deleted.
           "
 
   # ═══════════════════════════════════════════════
