@@ -1,0 +1,13 @@
+{
+  "title": "Timeloop Bus",
+  "time_of_day": "2:00 AM",
+  "atmosphere": "Eerie silence, hum of engine, darkness outside",
+  "bus_description": "Greyhound bus, about 20 seats, wc in back",
+  "rules": [
+    "Player can do ANY action",
+    "All actions have consequences (until reset)",
+    "Passengers reset each loop",
+    "Player human memory persists"
+  ],
+  "lamp_description": "Strange brass lamp driver keeps. Flickers oddly."
+}
