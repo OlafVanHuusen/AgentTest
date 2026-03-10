@@ -2,10 +2,10 @@
 # Autonomous Agent Loop
 #
 # Three agents collaborate:
-#   1. PO Agent     – reads PHASE*.md docs, converts each section into a
-#                     GitHub issue with full context, then deletes the .md
-#                     so tasks are never duplicated. When no .md plans remain,
-#                     writes suggestions.txt with project status & ideas.
+#   1. PO Agent     – reads all .md docs in the repo, uses its own judgement
+#                     to extract actionable tickets, creates GitHub issues
+#                     with full context, then deletes the processed .md files.
+#                     When no .md docs remain, writes suggestions.txt.
 #   2. Writer Agent – picks an open issue, implements it in a branch, opens PR
 #   3. Reviewer Agent – reviews PRs, runs tests, approves/requests changes
 #
@@ -75,63 +75,86 @@ jobs:
           opencode -m "$OPENCODE_MODEL" run "
           You are the **PO (Product Owner) Agent** for the Timeloop Bus project.
 
-          Your single mission: convert every task in the PHASE*.md plan files
-          into GitHub issues, then **remove the converted content** from the
-          .md files so tasks are never duplicated.
+          Your mission: read every .md file in the repo, extract actionable
+          work items using your own judgement, create GitHub issues for them,
+          then delete the processed .md files so nothing gets duplicated.
 
           ─────────────────────────────────────────────
-          ## STEP 1 — Check for PHASE*.md files
+          ## STEP 1 — Discover .md files
           ─────────────────────────────────────────────
-          1. Run \`ls PHASE*.md 2>/dev/null\` to see which phase files exist.
-          2. If **no** PHASE*.md files exist at all, skip to **STEP 5**
+          1. Run \`find . -maxdepth 1 -name '*.md' -type f | sort\` to list
+             every markdown file in the repo root.
+          2. Exclude these files — they are meta/reference and must NOT be
+             deleted or turned into tickets:
+             - README.md
+             - CHANGELOG.md
+             - CONTRIBUTING.md
+             - LICENSE.md
+          3. If **no** eligible .md files remain, skip to **STEP 5**
              (suggestions mode).
 
           ─────────────────────────────────────────────
-          ## STEP 2 — Read each PHASE file completely
+          ## STEP 2 — Read and understand each file
           ─────────────────────────────────────────────
-          For every PHASE*.md file that exists, read its **entire** content
-          with \`cat <filename>\`.
+          For every eligible .md file, run \`cat <filename>\` and read the
+          **entire** content.
 
-          Parse the file to extract:
-          - The **phase number** (from filename, e.g. PHASE3 → 3).
-          - The **phase title** (the first H1 heading, e.g. 'LLM Core').
-          - Every **section heading** (### lines like '### 3.1 LLM Base Interface').
-          - Every **task line** — lines matching \`- [ ]\` (unchecked checkbox).
-            Also include the surrounding context: any code blocks, bullet points,
-            or descriptions that belong to that task/section.
-
-          Group the tasks by section. Each section becomes **one GitHub issue**.
+          Now use your own reasoning to break the document into **tickets**.
+          A ticket is a self-contained, implementable unit of work. Use these
+          guidelines:
+          - Look for logical sections, feature descriptions, setup steps,
+            integration tasks, UI work, data definitions, testing tasks, etc.
+          - Do NOT rely on checkboxes (\`- [ ]\`). Many docs use prose,
+            code blocks, tables, or bullet lists to describe work — extract
+            tickets from ALL of these.
+          - Group tightly related items into a single ticket when they would
+            be implemented together (e.g. 'create a class + its methods').
+          - Split apart items that are independent enough to be worked on
+            separately (e.g. 'Ollama client' vs 'Groq client').
+          - Each ticket must be meaningful on its own — a developer should be
+            able to read just the ticket and know exactly what to build.
 
           ─────────────────────────────────────────────
           ## STEP 3 — Create GitHub issues
           ─────────────────────────────────────────────
-          For each **section** (e.g. '### 3.2 Ollama Client') create ONE issue:
 
-          **Title format:**
-          \`Phase <N>.<S> – <section title>\`
-          Example: \`Phase 3.2 – Ollama Client\`
+          ### Ticket title format
+          Use this structure (NO phase numbers, NO 'Phase X' prefixes):
+          \`[<area>] <concise action description>\`
 
-          **Body format (Markdown):**
+          Where **area** is one of:
+            \`setup\` | \`game\` | \`ui\` | \`llm\` | \`lore\` | \`audio\` |
+            \`web\` | \`test\` | \`polish\` | \`infra\`
+
+          Examples:
+          - \`[setup] Create project structure and config\`
+          - \`[llm] Implement Ollama client with health check\`
+          - \`[ui] Render bus interior with NPC sprites\`
+          - \`[game] Implement loop reset and time progression\`
+          - \`[lore] Define NPC data in JSON\`
+          - \`[test] Add compile checks for all modules\`
+
+          ### Ticket body format (Markdown)
           \`\`\`
+          ## Summary
+          <1–2 sentence description of what needs to be done>
+
           ## Source
-          File: \`<PHASE filename>\`
-          Phase: <phase title>
+          Extracted from: \`<filename>\`
 
-          ## Tasks
-          <paste ALL the checkbox lines from that section, verbatim>
-
-          ## Context
-          <paste any code blocks, descriptions, or notes that appeared
-           under that section heading — everything the Writer Agent
-           needs to implement it>
+          ## Details
+          <paste all relevant content from the .md that relates to this
+           ticket — descriptions, code blocks, examples, tables, rules,
+           expected behavior. Include EVERYTHING the Writer Agent needs.>
 
           ## Acceptance Criteria
-          - All checkbox items above are implemented
+          - <concrete, verifiable criteria derived from the details above>
+          - <another criterion>
           - Code compiles (\`python -m py_compile\`)
           - Follows project structure (game/, llm/, lore/, assets/)
           \`\`\`
 
-          Create the issue with:
+          ### Creating the issue
           \`\`\`
           gh issue create \\
             --title \"<title>\" \\
@@ -139,51 +162,43 @@ jobs:
             --label task
           \`\`\`
 
-          **Important**: Before creating, check for duplicates:
+          ### Duplicate check (run ONCE before creating anything)
           \`\`\`
           gh issue list --label task --state all --limit 500 --json number,title
           \`\`\`
-          Skip any section whose title already matches an existing issue
-          (open OR closed). Match by key words, ignore punctuation.
+          Store this list. Before creating each issue, check whether a
+          similar title already exists (open OR closed). Match by key words,
+          ignore punctuation and casing. **Skip** duplicates.
 
           ─────────────────────────────────────────────
-          ## STEP 4 — Remove converted content from .md
+          ## STEP 4 — Remove processed .md files
           ─────────────────────────────────────────────
-          After ALL issues for a PHASE file have been created (or skipped
-          because they already exist), **delete the PHASE*.md file entirely**:
-
+          After all tickets from a file have been created (or skipped as
+          duplicates), delete the file:
           \`\`\`
           git rm <filename>
           \`\`\`
 
-          Once all PHASE files are processed:
+          Once every eligible .md file is processed:
           \`\`\`
           git add -A
-          git commit -m 'chore: convert PHASE docs to issues and remove processed files'
+          git commit -m 'chore: convert docs to issues and remove processed .md files'
           git push origin main
           \`\`\`
 
-          This ensures the same tasks are never converted twice.
-
-          Also update IMPLEMENTATION_PLAN.md — if it contains an
-          'Implementation Phases' section with \`- [ ]\` checkboxes that
-          mirror the PHASE files, remove that section too (but keep the
-          rest of the file). Commit this change in the same commit.
-
           ─────────────────────────────────────────────
-          ## STEP 5 — No .md plans? Write suggestions
+          ## STEP 5 — No .md files? Write suggestions
           ─────────────────────────────────────────────
-          If **no** PHASE*.md files were found in Step 1:
+          If no eligible .md files were found in Step 1:
           1. List all open issues: \`gh issue list --label task --state open --limit 500 --json number,title\`
           2. List all closed issues: \`gh issue list --label task --state closed --limit 500 --json number,title\`
-          3. Read IMPLEMENTATION_PLAN.md (if it exists) for project context.
-          4. Based on what is done vs. remaining, write a file called
+          3. Based on what is done vs. remaining, write a file called
              \`suggestions.txt\` in the repo root with:
              - A summary of project progress (issues closed vs open).
              - Suggested next priorities or improvements.
              - Any gaps you notice (e.g. missing tests, missing docs).
              - Ideas for new features beyond the original plan.
-          5. Commit and push:
+          4. Commit and push:
              \`\`\`
              git add suggestions.txt
              git commit -m 'chore: update suggestions.txt with project status and ideas'
@@ -193,13 +208,13 @@ jobs:
           ─────────────────────────────────────────────
           ## Rules
           ─────────────────────────────────────────────
-          - **ONE issue per section** (### heading), NOT one issue per checkbox line.
-            Each issue bundles all tasks under that section.
-          - Include FULL context in the issue body — code examples, expected
-            output, questions — so the Writer Agent has everything it needs.
+          - Use your judgement to decide ticket granularity — not too big
+            (an entire file as one ticket) and not too small (one line each).
+          - Include FULL context in every issue body — code examples, expected
+            output, data structures — so the Writer Agent is self-sufficient.
           - Never create duplicate issues. Always check existing issues first.
-          - Always commit and push your .md removals so they don't get
-            re-processed on the next run.
+          - Always commit and push file deletions so they are not reprocessed.
+          - Do NOT delete README.md, CHANGELOG.md, CONTRIBUTING.md, LICENSE.md.
           - Print a final summary: files processed, issues created, issues
             skipped (duplicate), files deleted.
           "
