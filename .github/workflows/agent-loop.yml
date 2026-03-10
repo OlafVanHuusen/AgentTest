@@ -259,48 +259,82 @@ jobs:
           - Tech stack: Python 3.12, Pygame 2.5+, Pygbag for web export.
           - Resolution: 320×240, 8-bit pixel art aesthetic.
           - LLM integration via Ollama (local) and Groq (API).
-          - See IMPLEMENTATION_PLAN.md and PHASE*.md for full details.
+          - See IMPLEMENTATION_PLAN.md for full details.
           - Directory layout follows the plan: game/, llm/, lore/, assets/.
+          - Each issue body contains all the context you need (tasks, code
+            examples, acceptance criteria) — the PO Agent put it there.
 
           ## Step-by-step instructions
-          1. Run \`gh issue list --label task --state open --json number,title,assignees --jq '.[] | select(.assignees | length == 0)'\`
-             to find **unassigned** open issues labeled 'task'.
-          2. Pick the issue with the **lowest number** (oldest / earliest phase).
-             If none exist, output 'No open tasks available' and stop.
-          3. Comment on the issue to claim it:
+
+          ### Pick an issue
+          1. Run \`gh issue list --label task --state open --json number,title --jq 'sort_by(.number)'\`
+             to get all open task issues sorted oldest-first.
+          2. For each issue (starting from the lowest number), check its
+             comments to decide if you should pick it up:
+             \`\`\`
+             gh issue view <NUMBER> --json comments --jq '.comments[].body'
+             \`\`\`
+             Apply these rules **in order**:
+             a) If there is a comment containing **'Reviewer Agent requesting changes'**
+                (or similar from the Reviewer Agent), this issue needs rework —
+                **pick it up** regardless of other comments. Read the reviewer
+                feedback carefully; you must address every point.
+             b) If there is a comment containing **'Writer Agent picking this up'**
+                but NO reviewer change-request after it, **skip** this issue —
+                another worker already claimed it.
+             c) If there are no Writer Agent claim comments at all, the issue
+                is **unclaimed** — you may pick it up.
+          3. If no eligible issue is found after checking all of them, output
+             'No open tasks available' and stop.
+
+          ### Claim and implement
+          4. Comment on the chosen issue to claim it:
              \`gh issue comment <NUMBER> --body 'Writer Agent picking this up.'\`
-          4. Create a feature branch:
+          5. Create a feature branch:
              \`git checkout -b feature/issue-<NUMBER>-<short-slug>\`
-          5. **Read the related PHASE*.md file** to understand the full context
-             of the task (what files to create/edit, expected behavior, etc.).
-          6. Implement the task:
+             If this is a **rework** (reviewer requested changes), check if the
+             old branch still exists and reuse it:
+             \`\`\`
+             git fetch origin
+             git checkout feature/issue-<NUMBER>-<short-slug> 2>/dev/null || git checkout -b feature/issue-<NUMBER>-<short-slug>
+             \`\`\`
+          6. **Read the issue body** with \`gh issue view <NUMBER> --json body --jq .body\`
+             to get the full task description, code examples, and acceptance
+             criteria. This is your specification.
+          7. Implement the task:
              - Create or modify the necessary Python files.
              - Follow the project's file structure strictly (game/, llm/, lore/, assets/).
              - Write clean, well-commented code.
              - If a config value is needed, add it to config.py.
              - If a new dependency is required, add it to requirements.txt.
-          7. After writing code, **test it**:
+             - If this is a rework, address **every** point from the reviewer.
+          8. After writing code, **test it**:
              - Run \`python -m py_compile <file>\` for every .py file you created/modified.
              - If requirements.txt exists, run \`pip install -r requirements.txt\`.
              - Run \`python -m pytest\` if tests exist; otherwise run basic import checks.
              - If there are errors, fix them and re-test.
-          8. Commit with a meaningful message referencing the issue:
+          9. Commit with a meaningful message referencing the issue:
              \`git add -A && git commit -m 'feat: <description> (closes #<NUMBER>)'\`
-          9. Push the branch:
-             \`git push origin feature/issue-<NUMBER>-<short-slug>\`
-          10. Create a Pull Request:
+          10. Push the branch:
+              \`git push origin feature/issue-<NUMBER>-<short-slug>\`
+          11. Check if a PR already exists for this branch:
+              \`gh pr list --head feature/issue-<NUMBER>-<short-slug> --json number\`
+              - If a PR exists, just push (the PR updates automatically).
+              - If no PR exists, create one:
               \`\`\`
               gh pr create \\
                 --title 'feat: <description> (closes #<NUMBER>)' \\
                 --body 'Implements #<NUMBER>.\\n\\n## Changes\\n- <list changes>\\n\\n## Testing\\n- <what you tested>' \\
                 --label 'ready-for-review'
               \`\`\`
-          11. Print a summary of everything you did.
+          12. Print a summary of everything you did.
 
           ## Important rules
           - Only implement **one** issue per run.
           - Do NOT modify .md plan files.
           - Always verify your code compiles before pushing.
+          - **Never** pick up an issue that another Writer already claimed
+            unless the Reviewer Agent has requested changes on it.
           - If tests fail after 3 attempts to fix, push what you have and note
             the failure in the PR body.
           "
@@ -352,7 +386,7 @@ jobs:
 
           ## Context about the project
           - Tech stack: Python 3.12, Pygame 2.5+, Pygbag for web export.
-          - See IMPLEMENTATION_PLAN.md and PHASE*.md for the full specification.
+          - See IMPLEMENTATION_PLAN.md for the full specification.
           - Directory layout: game/, llm/, lore/, assets/.
 
           ## Step-by-step instructions
@@ -364,28 +398,45 @@ jobs:
              \`git fetch origin <headRefName> && git checkout <headRefName>\`
           5. Run \`gh pr view \$PR_NUMBER --json title,body,files\` to understand
              what the PR does and which files were changed.
-          6. Read the changed files and review them for:
+          6. Extract the linked issue number from the PR title or body
+             (look for 'closes #<num>' or '#<num>'). Store it as ISSUE_NUMBER.
+          7. Read the **issue body** to understand the acceptance criteria:
+             \`gh issue view \$ISSUE_NUMBER --json body --jq .body\`
+          8. Read the changed files and review them for:
              - **Correctness**: Does the code do what the linked issue describes?
+             - **Acceptance Criteria**: Are all checkboxes from the issue met?
              - **Style**: Is it clean, well-commented Python code?
              - **Structure**: Does it follow the project layout in IMPLEMENTATION_PLAN.md?
              - **Imports**: Are all imports valid? No missing dependencies?
              - **Config**: Are new settings added to config.py if needed?
-          7. **Run tests**:
+          9. **Run tests**:
              - \`python -m py_compile <file>\` for every changed .py file.
              - \`pip install -r requirements.txt\` if it exists.
              - \`python -m pytest\` if tests exist.
              - Try basic import: \`python -c 'import game; import llm'\` (ignore if those modules don't exist yet).
-          8. **Decision**:
-             a) If code is correct and tests pass:
-                - Approve: \`gh pr review \$PR_NUMBER --approve --body 'LGTM – code reviewed and tests pass.'\`
-                - Merge: \`gh pr merge \$PR_NUMBER --squash --delete-branch\`
-                - Find the linked issue number from the PR title/body (look for #<num>) and close it:
-                  \`gh issue close <ISSUE_NUMBER>\`
-                  \`gh issue edit <ISSUE_NUMBER> --add-label completed\`
-             b) If there are problems:
-                - Request changes: \`gh pr review \$PR_NUMBER --request-changes --body '<detailed feedback>'\`
-                - List every problem clearly so the Writer Agent can fix them.
-          9. Print a summary of your review.
+          10. **Decision**:
+              a) If code is correct and tests pass:
+                 - Approve: \`gh pr review \$PR_NUMBER --approve --body 'LGTM – code reviewed and tests pass.'\`
+                 - Merge: \`gh pr merge \$PR_NUMBER --squash --delete-branch\`
+                 - Close the linked issue:
+                   \`gh issue close \$ISSUE_NUMBER\`
+                   \`gh issue edit \$ISSUE_NUMBER --add-label completed\`
+              b) If there are problems:
+                 - Request changes on the **PR**:
+                   \`gh pr review \$PR_NUMBER --request-changes --body '<detailed feedback>'\`
+                 - **Also comment on the linked issue** so the Writer Agent
+                   knows to pick it back up for rework:
+                   \`\`\`
+                   gh issue comment \$ISSUE_NUMBER --body 'Reviewer Agent requesting changes on PR #'\$PR_NUMBER':
+
+                   <list every problem clearly, one per bullet>
+
+                   The Writer Agent should address all points above and push fixes.'
+                   \`\`\`
+                 - Remove the 'ready-for-review' label from the PR so it is
+                   not re-reviewed before the Writer fixes it:
+                   \`gh pr edit \$PR_NUMBER --remove-label ready-for-review\`
+          11. Print a summary of your review.
 
           ## Important rules
           - Be thorough but not pedantic — focus on correctness and structure.
@@ -393,4 +444,7 @@ jobs:
           - Never approve code that has syntax errors.
           - If the PR has merge conflicts, request changes and explain.
           - Only review **one** PR per run.
+          - When requesting changes, you MUST leave a comment on the **issue**
+            (not just the PR) using the exact phrase 'Reviewer Agent requesting
+            changes' so the Writer Agent can detect it.
           "
