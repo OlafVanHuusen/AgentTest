@@ -7,8 +7,8 @@
 #   3. Reviewer Agent – reviews PRs, runs tests, approves/requests changes
 #
 # Triggers
-#   • PO + Writer run on a schedule (every 2 hours) or manual dispatch
-#   • Reviewer runs when a PR is opened/updated or labeled "ready-for-review"
+#   • All three run sequentially on a schedule (every 2 hours) or manual dispatch
+#   • PO → Writer → Reviewer (chained via needs:)
 ###############################################################################
 
 name: Autonomous Agent Loop
@@ -28,12 +28,10 @@ on:
   schedule:
     - cron: "0 */2 * * *"        # every 2 hours
   workflow_dispatch:              # manual trigger
-  pull_request:
-    types: [opened, synchronize, reopened, labeled]
 
 # prevent overlapping runs of the same workflow
 concurrency:
-  group: agent-loop-${{ github.event_name }}
+  group: agent-loop
   cancel-in-progress: true
 
 jobs:
@@ -41,7 +39,6 @@ jobs:
   #  PO AGENT – backlog scanner
   # ═══════════════════════════════════════════════
   po-agent:
-    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -105,7 +102,6 @@ jobs:
   #  WRITER AGENT – implements one task per run
   # ═══════════════════════════════════════════════
   writer-agent:
-    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
     needs: po-agent
     runs-on: ubuntu-latest
     permissions:
@@ -207,24 +203,17 @@ jobs:
   #  REVIEWER AGENT – triggered by PRs
   # ═══════════════════════════════════════════════
   reviewer-agent:
-    if: >-
-      github.event_name == 'pull_request' &&
-      (
-        github.event.action == 'opened' ||
-        github.event.action == 'synchronize' ||
-        github.event.action == 'reopened' ||
-        (github.event.action == 'labeled' && github.event.label.name == 'ready-for-review')
-      )
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    needs: writer-agent
     runs-on: ubuntu-latest
     permissions:
       contents: write
       issues: write
       pull-requests: write
     steps:
-      - name: Checkout PR branch
+      - name: Checkout code
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.pull_request.head.ref }}
           fetch-depth: 0
 
       - name: Setup Node.js
@@ -250,12 +239,10 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PR_NUMBER: ${{ github.event.pull_request.number }}
         run: |
-          echo "Reviewing PR #$PR_NUMBER ..."
+          echo "Running Reviewer Agent..."
           opencode -m "$OPENCODE_MODEL" run "
           You are the **Reviewer Agent** for the Timeloop Bus project.
-          You are reviewing Pull Request **#$PR_NUMBER**.
 
           ## Context about the project
           - Tech stack: Python 3.12, Pygame 2.5+, Pygbag for web export.
@@ -263,34 +250,41 @@ jobs:
           - Directory layout: game/, llm/, lore/, assets/.
 
           ## Step-by-step instructions
-          1. Run \`gh pr view $PR_NUMBER --json title,body,files\` to understand
+          1. Run \`gh pr list --label ready-for-review --state open --json number,title,headRefName\`
+             to find open PRs that need review.
+          2. If no PRs are found, output 'No PRs to review' and stop.
+          3. Pick the **oldest** PR (lowest number). Let its number be PR_NUMBER.
+          4. Checkout the PR branch:
+             \`git fetch origin <headRefName> && git checkout <headRefName>\`
+          5. Run \`gh pr view \$PR_NUMBER --json title,body,files\` to understand
              what the PR does and which files were changed.
-          2. Read the changed files and review them for:
+          6. Read the changed files and review them for:
              - **Correctness**: Does the code do what the linked issue describes?
              - **Style**: Is it clean, well-commented Python code?
              - **Structure**: Does it follow the project layout in IMPLEMENTATION_PLAN.md?
              - **Imports**: Are all imports valid? No missing dependencies?
              - **Config**: Are new settings added to config.py if needed?
-          3. **Run tests**:
+          7. **Run tests**:
              - \`python -m py_compile <file>\` for every changed .py file.
              - \`pip install -r requirements.txt\` if it exists.
              - \`python -m pytest\` if tests exist.
              - Try basic import: \`python -c 'import game; import llm'\` (ignore if those modules don't exist yet).
-          4. **Decision**:
+          8. **Decision**:
              a) If code is correct and tests pass:
-                - Approve: \`gh pr review $PR_NUMBER --approve --body 'LGTM – code reviewed and tests pass.'\`
-                - Merge: \`gh pr merge $PR_NUMBER --squash --delete-branch\`
+                - Approve: \`gh pr review \$PR_NUMBER --approve --body 'LGTM – code reviewed and tests pass.'\`
+                - Merge: \`gh pr merge \$PR_NUMBER --squash --delete-branch\`
                 - Find the linked issue number from the PR title/body (look for #<num>) and close it:
                   \`gh issue close <ISSUE_NUMBER>\`
                   \`gh issue edit <ISSUE_NUMBER> --add-label completed\`
              b) If there are problems:
-                - Request changes: \`gh pr review $PR_NUMBER --request-changes --body '<detailed feedback>'\`
+                - Request changes: \`gh pr review \$PR_NUMBER --request-changes --body '<detailed feedback>'\`
                 - List every problem clearly so the Writer Agent can fix them.
-          5. Print a summary of your review.
+          9. Print a summary of your review.
 
           ## Important rules
           - Be thorough but not pedantic — focus on correctness and structure.
           - Always run compile checks before approving.
           - Never approve code that has syntax errors.
           - If the PR has merge conflicts, request changes and explain.
+          - Only review **one** PR per run.
           "
