@@ -1,13 +1,47 @@
+###############################################################################
+# Autonomous Agent Loop
+#
+# Three agents collaborate:
+#   1. PO Agent     – scans .md plans for unchecked tasks → creates issues
+#   2. Writer Agent – picks an open issue, implements it in a branch, opens PR
+#   3. Reviewer Agent – reviews PRs, runs tests, approves/requests changes
+#
+# Triggers
+#   • PO + Writer run on a schedule (every 2 hours) or manual dispatch
+#   • Reviewer runs when a PR is opened/updated or labeled "ready-for-review"
+###############################################################################
+
 name: Autonomous Agent Loop
 
+# ---------- shared env for every job ----------
+env:
+  OPENCODE_MODEL: "opencode/minimax-m2.5-free"   # free model, no API key needed
+  # NOTE: Optional repository secrets:
+  #   AGENT_PAT – a Personal Access Token so Writer PRs trigger the
+  #               Reviewer workflow (GITHUB_TOKEN cannot trigger new
+  #               workflow runs by design)
+
+# ──────────────────────────────────────────────
+# PO + Writer workflow  (scheduled / manual)
+# ──────────────────────────────────────────────
 on:
   schedule:
-    # Run every hour
-    - cron: '0 * * * *'
-  workflow_dispatch:  # Manual trigger
+    - cron: "0 */2 * * *"        # every 2 hours
+  workflow_dispatch:              # manual trigger
+  pull_request:
+    types: [opened, synchronize, reopened, labeled]
+
+# prevent overlapping runs of the same workflow
+concurrency:
+  group: agent-loop-${{ github.event_name }}
+  cancel-in-progress: true
 
 jobs:
+  # ═══════════════════════════════════════════════
+  #  PO AGENT – backlog scanner
+  # ═══════════════════════════════════════════════
   po-agent:
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -19,7 +53,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: "20"
 
       - name: Install OpenCode
         run: npm install -g opencode-ai
@@ -29,10 +63,50 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          echo "Running PO Agent to check .md files..."
-          opencode run "You are the PO Agent. Read all .md files in this project (IMPLEMENTATION_PLAN.md, PHASE*.md) and find unchecked [ ] tasks. For each new task found, create a GitHub Issue with label 'task'. Use 'gh issue create' command. Output a summary of what you found."
+          echo "Running PO Agent..."
+          opencode -m "$OPENCODE_MODEL" run "
+          You are the **PO (Product Owner) Agent** for the Timeloop Bus project.
 
+          ## Your mission
+          Scan every Markdown plan file in this repository and turn unchecked
+          tasks into GitHub Issues so the Writer Agent can pick them up.
+
+          ## Step-by-step instructions
+          1. Read **all** .md files in the repo root: IMPLEMENTATION_PLAN.md,
+             PHASE1_Foundation.md, PHASE2_Visuals.md, PHASE3_LLM_Core.md,
+             PHASE4_Game_Logic.md, PHASE5_Polish.md, PHASE6_Web_Export.md.
+          2. Extract every line that contains an unchecked checkbox \`- [ ]\`.
+          3. For each unchecked task, derive a short but descriptive issue title
+             and include the phase name (e.g. 'Phase 1 – 1.1 Create directory
+             structure').
+          4. Run \`gh issue list --label task --state open --json title --jq '.[].title'\`
+             to get the list of existing open issues.
+          5. **Skip** any task that already has a matching open issue (compare by
+             title similarity — do not create duplicates).
+          6. For each **new** task, run:
+             \`\`\`
+             gh issue create \\
+               --title \"<phase> – <task title>\" \\
+               --body \"From: <filename>\\n\\nTask: <full checkbox line>\\n\\nPhase context: <brief description>\" \\
+               --label task
+             \`\`\`
+          7. After processing all files, print a summary table:
+             | Status | Title |
+             |--------|-------|
+             | created / skipped (dup) | … |
+
+          ## Important rules
+          - Never create duplicate issues.
+          - Respect the order: Phase 1 tasks first, then Phase 2, etc.
+          - If zero new tasks are found, say so and exit cleanly.
+          "
+
+  # ═══════════════════════════════════════════════
+  #  WRITER AGENT – implements one task per run
+  # ═══════════════════════════════════════════════
   writer-agent:
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    needs: po-agent
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -41,11 +115,18 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # full history for branching
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: "20"
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
 
       - name: Install OpenCode
         run: npm install -g opencode-ai
@@ -55,36 +136,161 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
+      - name: Install Python deps (if requirements.txt exists)
+        run: |
+          if [ -f requirements.txt ]; then
+            pip install -r requirements.txt
+          fi
+
       - name: Run Writer Agent
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          echo "Running Writer Agent to implement tasks..."
-          opencode run "You are the Writer Agent. Find open issues with label 'task' that are not assigned. Use 'gh issue list --label task' to find them. Pick the oldest one, assign it to yourself with a comment, create a branch 'feature/issue-NUMBER-title-slug', implement the task, run tests, and create a PR. Use 'gh pr create' command. If tests fail, fix them. Output what you did."
+          echo "Running Writer Agent..."
+          opencode -m "$OPENCODE_MODEL" run "
+          You are the **Writer Agent** for the Timeloop Bus project — a Python /
+          Pygame text-adventure game. Your job is to pick ONE open task-issue,
+          implement it, and open a Pull Request.
 
+          ## Context about the project
+          - Tech stack: Python 3.12, Pygame 2.5+, Pygbag for web export.
+          - Resolution: 320×240, 8-bit pixel art aesthetic.
+          - LLM integration via Ollama (local) and Groq (API).
+          - See IMPLEMENTATION_PLAN.md and PHASE*.md for full details.
+          - Directory layout follows the plan: game/, llm/, lore/, assets/.
+
+          ## Step-by-step instructions
+          1. Run \`gh issue list --label task --state open --json number,title,assignees --jq '.[] | select(.assignees | length == 0)'\`
+             to find **unassigned** open issues labeled 'task'.
+          2. Pick the issue with the **lowest number** (oldest / earliest phase).
+             If none exist, output 'No open tasks available' and stop.
+          3. Comment on the issue to claim it:
+             \`gh issue comment <NUMBER> --body 'Writer Agent picking this up.'\`
+          4. Create a feature branch:
+             \`git checkout -b feature/issue-<NUMBER>-<short-slug>\`
+          5. **Read the related PHASE*.md file** to understand the full context
+             of the task (what files to create/edit, expected behavior, etc.).
+          6. Implement the task:
+             - Create or modify the necessary Python files.
+             - Follow the project's file structure strictly (game/, llm/, lore/, assets/).
+             - Write clean, well-commented code.
+             - If a config value is needed, add it to config.py.
+             - If a new dependency is required, add it to requirements.txt.
+          7. After writing code, **test it**:
+             - Run \`python -m py_compile <file>\` for every .py file you created/modified.
+             - If requirements.txt exists, run \`pip install -r requirements.txt\`.
+             - Run \`python -m pytest\` if tests exist; otherwise run basic import checks.
+             - If there are errors, fix them and re-test.
+          8. Commit with a meaningful message referencing the issue:
+             \`git add -A && git commit -m 'feat: <description> (closes #<NUMBER>)'\`
+          9. Push the branch:
+             \`git push origin feature/issue-<NUMBER>-<short-slug>\`
+          10. Create a Pull Request:
+              \`\`\`
+              gh pr create \\
+                --title 'feat: <description> (closes #<NUMBER>)' \\
+                --body 'Implements #<NUMBER>.\\n\\n## Changes\\n- <list changes>\\n\\n## Testing\\n- <what you tested>' \\
+                --label 'ready-for-review'
+              \`\`\`
+          11. Print a summary of everything you did.
+
+          ## Important rules
+          - Only implement **one** issue per run.
+          - Do NOT modify .md plan files.
+          - Always verify your code compiles before pushing.
+          - If tests fail after 3 attempts to fix, push what you have and note
+            the failure in the PR body.
+          "
+
+  # ═══════════════════════════════════════════════
+  #  REVIEWER AGENT – triggered by PRs
+  # ═══════════════════════════════════════════════
   reviewer-agent:
+    if: >-
+      github.event_name == 'pull_request' &&
+      (
+        github.event.action == 'opened' ||
+        github.event.action == 'synchronize' ||
+        github.event.action == 'reopened' ||
+        (github.event.action == 'labeled' && github.event.label.name == 'ready-for-review')
+      )
     runs-on: ubuntu-latest
     permissions:
       contents: write
       issues: write
       pull-requests: write
     steps:
-      - name: Checkout code
+      - name: Checkout PR branch
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          fetch-depth: 0
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: "20"
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
 
       - name: Install OpenCode
         run: npm install -g opencode-ai
+
+      - name: Install Python deps (if requirements.txt exists)
+        run: |
+          if [ -f requirements.txt ]; then
+            pip install -r requirements.txt
+          fi
 
       - name: Run Reviewer Agent
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
         run: |
-          echo "Running Reviewer Agent to review PRs..."
-          opencode run "You are the Reviewer Agent. Find open PRs with label 'ready-for-review' using 'gh pr list'. For each PR: fetch the branch, run tests, check code quality. If tests pass and code is good, approve with 'gh pr review --approve' and merge with 'gh pr merge --squash'. Add label 'completed' to the issue and close it. If there are issues, request changes with 'gh pr review --request-changes'. Output what you did."
+          echo "Reviewing PR #$PR_NUMBER ..."
+          opencode -m "$OPENCODE_MODEL" run "
+          You are the **Reviewer Agent** for the Timeloop Bus project.
+          You are reviewing Pull Request **#$PR_NUMBER**.
+
+          ## Context about the project
+          - Tech stack: Python 3.12, Pygame 2.5+, Pygbag for web export.
+          - See IMPLEMENTATION_PLAN.md and PHASE*.md for the full specification.
+          - Directory layout: game/, llm/, lore/, assets/.
+
+          ## Step-by-step instructions
+          1. Run \`gh pr view $PR_NUMBER --json title,body,files\` to understand
+             what the PR does and which files were changed.
+          2. Read the changed files and review them for:
+             - **Correctness**: Does the code do what the linked issue describes?
+             - **Style**: Is it clean, well-commented Python code?
+             - **Structure**: Does it follow the project layout in IMPLEMENTATION_PLAN.md?
+             - **Imports**: Are all imports valid? No missing dependencies?
+             - **Config**: Are new settings added to config.py if needed?
+          3. **Run tests**:
+             - \`python -m py_compile <file>\` for every changed .py file.
+             - \`pip install -r requirements.txt\` if it exists.
+             - \`python -m pytest\` if tests exist.
+             - Try basic import: \`python -c 'import game; import llm'\` (ignore if those modules don't exist yet).
+          4. **Decision**:
+             a) If code is correct and tests pass:
+                - Approve: \`gh pr review $PR_NUMBER --approve --body 'LGTM – code reviewed and tests pass.'\`
+                - Merge: \`gh pr merge $PR_NUMBER --squash --delete-branch\`
+                - Find the linked issue number from the PR title/body (look for #<num>) and close it:
+                  \`gh issue close <ISSUE_NUMBER>\`
+                  \`gh issue edit <ISSUE_NUMBER> --add-label completed\`
+             b) If there are problems:
+                - Request changes: \`gh pr review $PR_NUMBER --request-changes --body '<detailed feedback>'\`
+                - List every problem clearly so the Writer Agent can fix them.
+          5. Print a summary of your review.
+
+          ## Important rules
+          - Be thorough but not pedantic — focus on correctness and structure.
+          - Always run compile checks before approving.
+          - Never approve code that has syntax errors.
+          - If the PR has merge conflicts, request changes and explain.
+          "
