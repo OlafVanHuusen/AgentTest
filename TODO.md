@@ -1,1 +1,0 @@
-- please recreate the tickets 1.1, 1.2, 1.3 and 1.4 since the worker agents seem to not be able to pick them up
