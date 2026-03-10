@@ -1,0 +1,20 @@
+{
+  "ending_1_coma": {
+    "name": "Coma Wake",
+    "trigger": "examine driver's lamp closely",
+    "description": "Player wakes up from coma",
+    "result": "The lamp's strange energy triggers a memory - you were in a coma all along. The bus was your mind's way of coping. You wake up in a hospital bed, the timeloop finally broken."
+  },
+  "ending_2_dark_city": {
+    "name": "Dark City",
+    "trigger": "smash the lamp",
+    "description": "Bus arrives in dark city, loop breaks",
+    "result": "The lamp shatters with an impossible sound. The bus doesn't reset - it keeps driving. Through the windows, you see a dark, endless city. The driver finally speaks: 'We're here.' The loop is broken, but into what?"
+  },
+  "ending_3_give_up": {
+    "name": "Give Up",
+    "trigger": "kill yourself",
+    "description": "Loop ends, no restart",
+    "result": "Following the kid's instructions, you end your own existence within the loop. But instead of resetting, everything goes dark. Then - silence. The loop is truly over. Whether you wanted this or not... it's done."
+  }
+}
