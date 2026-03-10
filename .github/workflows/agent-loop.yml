@@ -1,0 +1,90 @@
+name: Autonomous Agent Loop
+
+on:
+  schedule:
+    # Run every hour
+    - cron: '0 * * * *'
+  workflow_dispatch:  # Manual trigger
+
+jobs:
+  po-agent:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install OpenCode
+        run: npm install -g opencode-ai
+
+      - name: Run PO Agent
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "Running PO Agent to check .md files..."
+          opencode run "You are the PO Agent. Read all .md files in this project (IMPLEMENTATION_PLAN.md, PHASE*.md) and find unchecked [ ] tasks. For each new task found, create a GitHub Issue with label 'task'. Use 'gh issue create' command. Output a summary of what you found."
+
+  writer-agent:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install OpenCode
+        run: npm install -g opencode-ai
+
+      - name: Configure Git
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Run Writer Agent
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "Running Writer Agent to implement tasks..."
+          opencode run "You are the Writer Agent. Find open issues with label 'task' that are not assigned. Use 'gh issue list --label task' to find them. Pick the oldest one, assign it to yourself with a comment, create a branch 'feature/issue-NUMBER-title-slug', implement the task, run tests, and create a PR. Use 'gh pr create' command. If tests fail, fix them. Output what you did."
+
+  reviewer-agent:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install OpenCode
+        run: npm install -g opencode-ai
+
+      - name: Run Reviewer Agent
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "Running Reviewer Agent to review PRs..."
+          opencode run "You are the Reviewer Agent. Find open PRs with label 'ready-for-review' using 'gh pr list'. For each PR: fetch the branch, run tests, check code quality. If tests pass and code is good, approve with 'gh pr review --approve' and merge with 'gh pr merge --squash'. Add label 'completed' to the issue and close it. If there are issues, request changes with 'gh pr review --request-changes'. Output what you did."

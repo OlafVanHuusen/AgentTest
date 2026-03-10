@@ -1,0 +1,20 @@
+name: Escalation Alert
+
+on:
+  issues:
+    types: [opened, labeled]
+
+jobs:
+  alert:
+    runs-on: ubuntu-latest
+    if: github.event.label.name == 'escalation' || contains(github.event.issue.title, 'ESCALATION')
+    steps:
+      - name: Create check run
+        run: |
+          echo "⚠️ ESCALATION DETECTED"
+          echo "Issue: ${{ github.event.issue.html_url }}"
+          echo "Title: ${{ github.event.issue.title }}"
+          echo "Body: ${{ github.event.issue.body }}"
+          
+          # Add a comment acknowledging the escalation
+          gh issue comment ${{ github.event.issue.number }} --body "This escalation has been detected. Please review and take action."
