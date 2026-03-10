@@ -1,0 +1,30 @@
+{
+  "driver": {
+    "name": "The Driver",
+    "description": "Middle-aged, silent, never takes eyes off road",
+    "attributes": ["stoic", "aware", "protective"],
+    "secret": "Has a strange lamp, is aware of the loop",
+    "location": "front"
+  },
+  "alex": {
+    "name": "Alex",
+    "description": "Young gamer, earbuds in, gaming on phone",
+    "attributes": ["gruff", "helpful", "distracted"],
+    "secret": "Knows about the lamp",
+    "location": "seat_1"
+  },
+  "maria": {
+    "name": "Maria",
+    "description": "Anxious, keeps checking watch",
+    "attributes": ["nervous", "observant", "scared"],
+    "secret": "Has seen loops before, remembers fragments",
+    "location": "seat_2"
+  },
+  "emo_boy": {
+    "name": "The Kid",
+    "description": "Young, quiet, emo aesthetic",
+    "attributes": ["silent", "melancholic", "knowing"],
+    "secret": "Knows how to end it all",
+    "location": "seat_3"
+  }
+}
