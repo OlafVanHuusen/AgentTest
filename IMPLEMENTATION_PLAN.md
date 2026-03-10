@@ -211,44 +211,6 @@ timeloop-bus/
 }
 ```
 
-## Implementation Phases
-
-### Phase 1: Foundation (Day 1 - 2 hours)
-- [ ] Set up Pygame window (320x240)
-- [ ] Basic game loop structure
-- [ ] Config file with settings
-- [ ] JSON lore loading
-
-### Phase 2: Visuals (Day 1 - 2 hours)
-- [ ] Draw bus interior (placeholder rectangles)
-- [ ] Draw NPCs (colored shapes)
-- [ ] Add clock and loop counter UI
-- [ ] Text input box rendering
-
-### Phase 3: LLM Core (Day 1 - 3 hours)
-- [ ] Ollama client setup (test Docker)
-- [ ] Groq client setup (API key)
-- [ ] Fallback handler
-- [ ] Prompt builder from JSON
-- [ ] Basic action → LLM → response flow
-
-### Phase 4: Game Logic (Day 1 - 2 hours)
-- [ ] Time progression (action = 1 minute)
-- [ ] Loop reset at 10 minutes
-- [ ] Action tracking for consistency
-- [ ] Ending detection and handling
-
-### Phase 5: Polish (Day 1 - 1 hour)
-- [ ] Pixel art sprites (decide source)
-- [ ] Visual feedback for actions (broken window, etc.)
-- [ ] Debug mode (show prompts/responses)
-- [ ] Basic ambient sound (optional)
-
-### Phase 6: Web Export (Optional - 1 hour)
-- [ ] Pygbag setup
-- [ ] Web build test
-- [ ] index.html wrapper
-
 ## Dependencies
 
 ```
