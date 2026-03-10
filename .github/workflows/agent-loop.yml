@@ -7,7 +7,9 @@
 #                     with full context, then deletes the processed .md files.
 #                     When no .md docs remain, writes suggestions.txt.
 #   2. Writer Agent – picks an open issue, implements it in a branch, opens PR
-#   3. Reviewer Agent – reviews PRs, runs tests, approves/requests changes
+#   3. Reviewer Agent – reviews PRs, runs the project locally (headless Pygame
+#                       via Xvfb), tests imports/compilation/runtime, approves
+#                       or requests changes with a full test report
 #
 # Triggers
 #   • All three run sequentially on a schedule (every 2 hours) or manual dispatch
@@ -390,6 +392,16 @@ jobs:
             pip install -r requirements.txt
           fi
 
+      - name: Setup virtual display (headless Pygame)
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq xvfb libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-ttf-dev
+          # Start a virtual framebuffer so Pygame can init a display
+          Xvfb :99 -screen 0 1024x768x24 &
+          echo "DISPLAY=:99" >> $GITHUB_ENV
+          echo "SDL_VIDEODRIVER=x11" >> $GITHUB_ENV
+          echo "SDL_AUDIODRIVER=dummy" >> $GITHUB_ENV
+
       - name: Run Reviewer Agent
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -398,6 +410,18 @@ jobs:
           echo "Running Reviewer Agent..."
           opencode -m "$OPENCODE_MODEL" run "
           You are the **Reviewer Agent** for the Timeloop Bus project.
+          Your job is to **thoroughly test** every PR — not just read the code,
+          but actually run it in this CI environment and verify it works.
+
+          ## Environment info
+          - Python 3.12 is installed, Pygame and deps from requirements.txt
+            are already installed.
+          - A virtual display (Xvfb) is running on :99 so Pygame can
+            initialize a window headlessly. The env vars DISPLAY, 
+            SDL_VIDEODRIVER, and SDL_AUDIODRIVER are already set.
+          - You **cannot** see the UI visually, but you CAN detect:
+            crashes, import errors, runtime exceptions, tracebacks,
+            hanging processes, and whether the game loop starts without error.
 
           ## Context about the project
           - Tech stack: Python 3.12, Pygame 2.5+, Pygbag for web export.
@@ -405,61 +429,147 @@ jobs:
           - Directory layout: game/, llm/, lore/, assets/.
 
           ## Step-by-step instructions
+
+          ### 1. Find a PR to review
           1. Run \`gh pr list --label ready-for-review --state open --json number,title,headRefName\`
-             to find open PRs that need review.
-          2. If no PRs are found, output 'No PRs to review' and stop.
-          3. Pick the **oldest** PR (lowest number). Let its number be PR_NUMBER.
+          2. If no PRs found, output 'No PRs to review' and stop.
+          3. Pick the **oldest** PR (lowest number). Store as PR_NUMBER.
+
+          ### 2. Checkout and understand
           4. Checkout the PR branch:
              \`git fetch origin <headRefName> && git checkout <headRefName>\`
-          5. Run \`gh pr view \$PR_NUMBER --json title,body,files\` to understand
-             what the PR does and which files were changed.
-          6. Extract the linked issue number from the PR title or body
-             (look for 'closes #<num>' or '#<num>'). Store it as ISSUE_NUMBER.
-          7. Read the **issue body** to understand the acceptance criteria:
+          5. Run \`gh pr view \$PR_NUMBER --json title,body,files\` to see
+             what changed.
+          6. Extract the linked issue number (look for 'closes #<num>' or
+             '#<num>'). Store as ISSUE_NUMBER.
+          7. Read the issue body for acceptance criteria:
              \`gh issue view \$ISSUE_NUMBER --json body --jq .body\`
-          8. Read the changed files and review them for:
-             - **Correctness**: Does the code do what the linked issue describes?
-             - **Acceptance Criteria**: Are all checkboxes from the issue met?
-             - **Style**: Is it clean, well-commented Python code?
-             - **Structure**: Does it follow the project layout in IMPLEMENTATION_PLAN.md?
-             - **Imports**: Are all imports valid? No missing dependencies?
-             - **Config**: Are new settings added to config.py if needed?
-          9. **Run tests**:
-             - \`python -m py_compile <file>\` for every changed .py file.
-             - \`pip install -r requirements.txt\` if it exists.
-             - \`python -m pytest\` if tests exist.
-             - Try basic import: \`python -c 'import game; import llm'\` (ignore if those modules don't exist yet).
-          10. **Decision**:
-              a) If code is correct and tests pass:
-                 - Approve: \`gh pr review \$PR_NUMBER --approve --body 'LGTM – code reviewed and tests pass.'\`
-                 - Merge: \`gh pr merge \$PR_NUMBER --squash --delete-branch\`
-                 - Close the linked issue:
-                   \`gh issue close \$ISSUE_NUMBER\`
-                   \`gh issue edit \$ISSUE_NUMBER --add-label completed\`
-              b) If there are problems:
-                 - Request changes on the **PR**:
-                   \`gh pr review \$PR_NUMBER --request-changes --body '<detailed feedback>'\`
-                 - **Also comment on the linked issue** so the Writer Agent
-                   knows to pick it back up for rework:
-                   \`\`\`
-                   gh issue comment \$ISSUE_NUMBER --body 'Reviewer Agent requesting changes on PR #'\$PR_NUMBER':
+          8. Read every changed file to understand the code.
 
-                   <list every problem clearly, one per bullet>
+          ### 3. Static checks (code review)
+          9. Review the changed files for:
+             - **Correctness**: Does the code match the issue description?
+             - **Acceptance Criteria**: Are all criteria from the issue met?
+             - **Style**: Clean, well-commented Python code?
+             - **Structure**: Follows project layout (game/, llm/, lore/, assets/)?
+             - **Imports**: All imports valid? No missing dependencies?
+             - **Config**: New settings added to config.py if needed?
 
-                   The Writer Agent should address all points above and push fixes.'
-                   \`\`\`
-                 - Remove the 'ready-for-review' label from the PR so it is
-                   not re-reviewed before the Writer fixes it:
-                   \`gh pr edit \$PR_NUMBER --remove-label ready-for-review\`
-          11. Print a summary of your review.
+          ### 4. Compilation checks
+          10. Run \`python -m py_compile <file>\` for **every** .py file in the
+              project (not just changed ones — catch broken cross-references):
+              \`\`\`
+              find . -name '*.py' -exec python -m py_compile {} +
+              \`\`\`
+          11. If any file fails to compile, that is an **automatic rejection**.
+
+          ### 5. Import and module checks
+          12. Try importing every top-level package:
+              \`\`\`
+              python -c 'import game' 2>&1 || true
+              python -c 'import llm' 2>&1 || true
+              python -c 'import config' 2>&1 || true
+              \`\`\`
+          13. For every changed .py file, try importing it directly:
+              \`\`\`
+              python -c 'import game.state' 2>&1 || true
+              python -c 'import game.renderer' 2>&1 || true
+              \`\`\`
+              (Adapt module paths to the actual changed files.)
+              Record any ImportError or ModuleNotFoundError.
+
+          ### 6. Run the project (the critical test)
+          14. **Attempt to run main.py** with a timeout. The game uses Pygame
+              which needs a display — the virtual framebuffer is already
+              running, so Pygame.init() should succeed.
+
+              Run it for a few seconds and capture output + errors:
+              \`\`\`
+              timeout 10 python main.py > /tmp/game_output.txt 2>&1 || true
+              cat /tmp/game_output.txt
+              \`\`\`
+
+              Evaluate the output:
+              - **SUCCESS indicators**: 'pygame', 'initialized', game loop
+                messages, no tracebacks.
+              - **FAILURE indicators**: Traceback, Exception, Error,
+                segfault, 'ModuleNotFoundError', 'FileNotFoundError',
+                'AttributeError', 'TypeError', etc.
+              - It's OK if it exits after the timeout (that means the game
+                loop was running). A clean timeout is a PASS.
+              - It's NOT OK if it crashes immediately with an exception.
+
+          15. If main.py doesn't exist yet, that's fine — skip this step
+              and note it in your review.
+
+          ### 7. Run tests
+          16. Run \`python -m pytest -v 2>&1 || true\` if any test files exist.
+              \`\`\`
+              find . -name 'test_*.py' -o -name '*_test.py' | head -5
+              \`\`\`
+              If tests exist, run them. If they don't, note it.
+
+          ### 8. Functional spot-checks
+          17. Based on what the PR implements, try to exercise the code
+              directly. Examples:
+              - If it adds a GameState class: \`python -c 'from game.state import GameState; s = GameState(); print(vars(s))'\`
+              - If it adds an LLM client: \`python -c 'from llm.ollama import OllamaClient; c = OllamaClient(); print(c)'\`
+              - If it adds a renderer: \`python -c 'import pygame; pygame.init(); from game.renderer import Renderer; r = Renderer(pygame.display.set_mode((320,240))); print(\"OK\")'\`
+              - If it adds JSON lore files: \`python -c 'import json; json.load(open(\"lore/npcs.json\")); print(\"valid JSON\")'\`
+              Adapt these to the actual code. The goal is to verify the new
+              code **actually runs**, not just compiles.
+              Wrap each in \`|| true\` so one failure doesn't stop the rest.
+
+          ### 9. Decision
+          18. Compile a **test report** summarizing:
+              - Compilation: PASS/FAIL
+              - Imports: PASS/FAIL (list any failures)
+              - main.py run: PASS/FAIL/SKIPPED (include output snippet)
+              - Tests: PASS/FAIL/SKIPPED
+              - Spot-checks: PASS/FAIL per check
+
+          19. **If everything passes** (or failures are minor and unrelated
+              to this PR's changes):
+              - Approve:
+                \`gh pr review \$PR_NUMBER --approve --body 'LGTM – code reviewed and all tests pass.\\n\\n<paste test report>'\`
+              - Merge: \`gh pr merge \$PR_NUMBER --squash --delete-branch\`
+              - Close the linked issue:
+                \`gh issue close \$ISSUE_NUMBER\`
+                \`gh issue edit \$ISSUE_NUMBER --add-label completed\`
+
+          20. **If there are problems** (crashes, import errors, missing
+              files, acceptance criteria not met, runtime exceptions):
+              - Request changes on the **PR** with the full test report:
+                \`gh pr review \$PR_NUMBER --request-changes --body '<detailed feedback with test report>'\`
+              - Comment on the **issue** so the Writer picks it back up:
+                \`\`\`
+                gh issue comment \$ISSUE_NUMBER --body 'Reviewer Agent requesting changes on PR #'\$PR_NUMBER':
+
+                ## Test Report
+                <paste the test report>
+
+                ## Required Fixes
+                <list every problem clearly, one per bullet>
+
+                The Writer Agent should address all points above and push fixes.'
+                \`\`\`
+              - Remove the label:
+                \`gh pr edit \$PR_NUMBER --remove-label ready-for-review\`
+
+          21. Print a summary of your review and test results.
 
           ## Important rules
-          - Be thorough but not pedantic — focus on correctness and structure.
-          - Always run compile checks before approving.
-          - Never approve code that has syntax errors.
+          - **Always run the project** — never approve based on code reading
+            alone. If you cannot run it, explain why in your review.
+          - Be thorough but not pedantic — focus on whether the code actually
+            works, not stylistic nitpicks.
+          - Always run compilation checks before approving.
+          - Never approve code that has syntax errors or crashes on import.
           - If the PR has merge conflicts, request changes and explain.
           - Only review **one** PR per run.
           - When requesting changes, you MUST leave a comment on the **issue**
             (not just the PR) using the exact phrase 'Reviewer Agent requesting
             changes' so the Writer Agent can detect it.
+          - Include the full test report in both the PR review and issue
+            comment so the Writer knows exactly what failed.
           "
