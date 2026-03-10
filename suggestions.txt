@@ -27,6 +27,8 @@ The project has a complete implementation plan documented in IMPLEMENTATION_PLAN
 
 **All 34 issues are open and ready for implementation.**
 
+**Note**: No Python code has been written yet. The project is at the planning stage with all implementation tasks tracked as GitHub issues.
+
 ## Suggested Next Priorities
 
 ### Immediate (Start with Phase 1)
@@ -44,18 +46,22 @@ The project has a complete implementation plan documented in IMPLEMENTATION_PLAN
 
 ## Identified Gaps
 
-1. **No tests yet** - Phase 3.7 and 5.6 cover testing but no unit tests exist
-2. **No audio assets** - Phase 5.4 (Ambient Sound) is marked optional
-3. **Web deployment not started** - Phases 6.x are all open
-4. **Placeholder graphics** - Using code-drawn shapes, no actual pixel art
+1. **No Python code yet** - Need to implement all phases from scratch
+2. **No tests yet** - Phase 3.7 and 5.6 cover testing but no unit tests exist
+3. **No audio assets** - Phase 5.4 (Ambient Sound) is marked optional
+4. **Web deployment not started** - Phases 6.x are all open
+5. **No lore JSON files** - Need to create npcs.json, setting.json, endings.json
+6. **No placeholder graphics** - Need to create pixel art sprites
 
 ## Ideas for New Features (Beyond Original Plan)
 
-1. **Save/Load System** - Persist progress between sessions (mentioned in Future Considerations)
+1. **Save/Load System** - Persist progress between sessions
 2. **Multiple Routes** - Expand beyond 3 endings
 3. **Achievement System** - Track player discoveries
 4. **Mobile Touch Controls** - Extend beyond keyboard-only
 5. **Expanded Lore** - More NPCs, deeper backstory
+6. **Cross-Platform Support** - Mobile, console ports
+7. **Modding Support** - Allow custom lore/characters
 
 ## Recommendations
 
@@ -63,3 +69,4 @@ The project has a complete implementation plan documented in IMPLEMENTATION_PLAN
 2. Consider pair-running Phase 2 (Visuals) and Phase 3 (LLM) since they're independent
 3. Prioritize LLM integration early since it's core to the game experience
 4. Test all three endings before marking phases complete
+5. Create lore JSON files early so they're available for prompt building
