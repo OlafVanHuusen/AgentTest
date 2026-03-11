@@ -485,8 +485,8 @@ jobs:
 
               Run it for a few seconds and capture output + errors:
               \`\`\`
-              timeout 10 python main.py > /tmp/game_output.txt 2>&1 || true
-              cat /tmp/game_output.txt
+              timeout 10 python main.py > game_output.txt 2>&1 || true
+              cat game_output.txt
               \`\`\`
 
               Evaluate the output:
