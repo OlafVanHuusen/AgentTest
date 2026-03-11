@@ -1,6 +1,11 @@
+import os
+
 SCREEN_WIDTH = 320
 SCREEN_HEIGHT = 240
 SCALE = 3
+
+FONT_PATH = os.path.join(os.path.dirname(__file__), "assets", "fonts", "pixel.ttf")
+FONT_SIZE = 8
 
 MINUTES_PER_ACTION = 1
 MAX_MINUTES = 10
