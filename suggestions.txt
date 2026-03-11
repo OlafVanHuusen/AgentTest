@@ -19,11 +19,15 @@
 - **Phase 6 (Web)**: 0% complete - Pygbag setup, web build, testing, deployment
 
 ## Completed Issues
-- Phase 1.4 – Lore Loading (lore_loader.py, JSON files in lore/)
-- Phase 1.5 – Basic Renderer (Placeholder) (renderer.py)
-- Phase 3.3 – Groq API Client (llm/groq.py)
+
+| Issue # | Title |
+|---------|-------|
+| 171 | Phase 3.3 – Groq API Client |
+| 163 | Phase 1.5 – Basic Renderer (Placeholder) |
+| 162 | Phase 1.4 – Lore Loading |
 
 ## Implemented Code (Verified)
+
 - config.py - Game settings
 - main.py - Entry point with game loop
 - game/state.py - Game state management
@@ -35,6 +39,7 @@
 - lore/setting.json - Bus atmosphere and rules
 
 ## Missing/Incomplete
+
 - Ollama client (llm/ollama.py) - Phase 3.2
 - LLM base interface - Phase 3.1
 - All Phase 2 (Visuals) - Bus interior, NPCs, UI
