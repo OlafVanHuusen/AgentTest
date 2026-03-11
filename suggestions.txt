@@ -5,9 +5,9 @@
 | Status | Count |
 |--------|-------|
 | Completed | 5 |
-| Open | 50 |
+| Open | 22 |
 
-**Total Issues**: 55 (5 completed, 50 remaining)
+**Total Issues**: 27 (5 completed, 22 remaining)
 
 ## Current Status by Category
 
@@ -15,9 +15,9 @@
 - Project structure and config
 - config.py with game settings
 
-### Lore (In Progress)
+### Lore (Completed)
 - Lore loading system - DONE
-- npcs.json - DONE  
+- npcs.json - DONE
 - setting.json - DONE
 - endings.json - DONE
 
@@ -68,14 +68,6 @@
 | 169 | Phase 3.1 – LLM Base Interface |
 | 163 | Phase 1.5 – Basic Renderer (Placeholder) |
 | 162 | Phase 1.4 – Lore Loading |
-| 203 | [lore] Implement lore loading system |
-| 202 | [game] Implement game state management |
-| 201 | [game] Create main entry point with game loop |
-| 200 | [setup] Create project structure and config |
-| 199 | [setup] Create config.py with game settings |
-| 198 | [lore] Create endings.json with 3 endings |
-| 197 | [lore] Create setting.json with bus atmosphere and rules |
-| 196 | [lore] Create npcs.json with detailed NPC definitions |
 
 ## Implemented Code (Verified)
 
@@ -108,6 +100,7 @@
 5. **Inconsistent issue naming** - Mix of new format and "Phase X" format
 6. **Hardcoded values** - LLM models, settings should be configurable
 7. **Input handler not integrated** - Phase 4.6 not done
+8. **No README.md** - Project documentation missing
 
 ## Ideas for New Features
 
