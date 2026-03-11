@@ -4,98 +4,106 @@
 
 | Status | Count |
 |--------|-------|
-| Completed | 5 |
-| Open | 50 |
+| Completed | 6 |
+| Open | 30 |
 
-**Total Issues**: 55 (5 completed, 50 remaining)
+**Total Issues**: 36 (6 completed, 30 remaining)
 
 ## Current Status by Category
 
 ### Setup (Completed)
-- Project structure and config
-- config.py with game settings
+- [x] #200 [setup] Create project structure and config
+- [x] #199 [setup] Create config.py with game settings
 
-### Lore (In Progress)
-- Lore loading system - DONE
-- npcs.json - DONE  
-- setting.json - DONE
-- endings.json - DONE
+### Lore (Completed)
+- [x] #203 [lore] Implement lore loading system
+- [x] #196 [lore] Create npcs.json with detailed NPC definitions
+- [x] #198 [lore] Create endings.json with 3 endings
+- [x] #197 [lore] Create setting.json with bus atmosphere and rules
 
-### Game (In Progress)
-- Main entry point with game loop - DONE
-- Game state management - DONE
+### Game (Completed)
+- [x] #201 [game] Create main entry point with game loop
+- [x] #202 [game] Implement game state management
 
 ### LLM (Partial)
-- LLM Base Interface - DONE
-- Ollama Client - DONE
-- Groq API Client - DONE
-- Failover Handler - pending
-- Prompt Builder - pending
-- Full Integration - pending
+- [x] #169 Phase 3.1 – LLM Base Interface
+- [x] #170 Phase 3.2 – Ollama Client
+- [x] #171 Phase 3.3 – Groq API Client
+- [ ] #172 Phase 3.4 – Failover Handler
+- [ ] #173 Phase 3.5 – Prompt Builder
+- [ ] #174 Phase 3.6 – Full Integration
+- [ ] #175 Phase 3.7 – Testing
 
 ### Visuals (Not Started)
-- Bus Interior
-- NPCs
-- UI Elements
-- Visual States
-- Font
+- [ ] #164 Phase 2.1 – Bus Interior
+- [ ] #165 Phase 2.2 – NPCs
+- [ ] #166 Phase 2.3 – UI Elements
+- [ ] #167 Phase 2.4 – Visual States
+- [ ] #168 Phase 2.5 – Font
 
 ### Time Loop (Not Started)
-- Time System
-- Loop Manager
-- Action Tracker (Consistency)
-- Ending Detection
-- Lightning Effect (LLM Failure)
+- [ ] #176 Phase 4.1 – Time System
+- [ ] #177 Phase 4.2 – Loop Manager
+- [ ] #178 Phase 4.3 – Action Tracker (Consistency)
+- [ ] #179 Phase 4.4 – Ending Detection
+- [ ] #180 Phase 4.5 – Lightning Effect (LLM Failure)
+- [ ] #181 Phase 4.6 – Input Handler Integration
 
 ### Polish (Not Started)
-- Pixel Art Sprites
-- Visual Feedback for Actions
-- Debug Mode
-- Ambient Sound (Optional)
+- [ ] #182 Phase 5.1 – Pixel Art Sprites
+- [ ] #183 Phase 5.2 – Visual Feedback for Actions
+- [ ] #184 Phase 5.3 – Debug Mode
+- [ ] #185 Phase 5.4 – Ambient Sound (Optional)
+- [ ] #186 Phase 5.5 – UI Polish
+- [ ] #187 Phase 5.6 – Final Testing
 
 ### Web (Not Started)
-- Pygbag Setup
-- Web Build
-- Testing
-- Deployment
+- [ ] #188 Phase 6.1 – Pygbag Setup
+- [ ] #189 Phase 6.2 – Web Build
+- [ ] #190 Phase 6.3 – Testing
+- [ ] #191 Phase 6.4 – Web-Specific Considerations
+- [ ] #192 Phase 6.5 – Deployment (Optional)
 
 ## Completed Issues
 
 | Issue # | Title |
 |---------|-------|
+| 203 | [lore] Implement lore loading system |
+| 202 | [game] Implement game state management |
+| 201 | [game] Create main entry point with game loop |
+| 196 | [lore] Create npcs.json with detailed NPC definitions |
 | 171 | Phase 3.3 – Groq API Client |
 | 170 | Phase 3.2 – Ollama Client |
 | 169 | Phase 3.1 – LLM Base Interface |
 | 163 | Phase 1.5 – Basic Renderer (Placeholder) |
 | 162 | Phase 1.4 – Lore Loading |
-| 203 | [lore] Implement lore loading system |
-| 202 | [game] Implement game state management |
-| 201 | [game] Create main entry point with game loop |
-| 200 | [setup] Create project structure and config |
-| 199 | [setup] Create config.py with game settings |
-| 198 | [lore] Create endings.json with 3 endings |
-| 197 | [lore] Create setting.json with bus atmosphere and rules |
-| 196 | [lore] Create npcs.json with detailed NPC definitions |
 
 ## Implemented Code (Verified)
 
+**Core:**
 - config.py - Game settings
 - main.py - Entry point with game loop
 - game/state.py - Game state management
 - game/lore_loader.py - Lore loading system
 - game/renderer.py - Basic renderer
+
+**LLM:**
 - llm/base.py - LLM base interface
 - llm/groq.py - Groq API client
 - llm/ollama.py - Ollama API client
+
+**Lore:**
 - lore/endings.json - 3 endings defined
-- lore/npcs.json - NPC definitions
+- lore/npcs.json - NPC definitions (15 NPCs)
 - lore/setting.json - Bus atmosphere and rules
 
 ## Suggested Next Priorities
 
-1. **Complete LLM Integration** - Failover handler, prompt builder, full integration
-2. **Phase 2 (Visuals)** - Bus interior rendering is foundational for gameplay
-3. **Phase 4 (Time Loop)** - Core game mechanic - time system, loop manager
+1. **Phase 2 (Visuals)** - Bus interior rendering is foundational
+   - Start with #164 Phase 2.1 Bus Interior
+   - Then #165 NPCs, #166 UI Elements
+2. **Complete LLM Integration** - Phase 3.4-3.7 (#172-175)
+3. **Phase 4 (Time Loop)** - Core game mechanic
 4. **Phase 5 (Polish)** - After core mechanics are done
 5. **Phase 6 (Web)** - Optional deployment
 
@@ -105,9 +113,10 @@
 2. **No audio implementation** - Phase 5.4 marked optional
 3. **No error handling** for malformed lore JSON
 4. **No CI/CD pipeline**
-5. **Inconsistent issue naming** - Mix of new format and "Phase X" format
-6. **Hardcoded values** - LLM models, settings should be configurable
-7. **Input handler not integrated** - Phase 4.6 not done
+5. **Input handler not integrated** - Phase 4.6 not done
+6. **Basic renderer is placeholder only** - Needs full implementation
+7. **No unified LLM interface** - Both Ollama and Groq exist but no common abstraction
+8. **Hardcoded LLM model names** in config
 
 ## Ideas for New Features
 
@@ -122,5 +131,5 @@
 
 - DEBUG_MODE = True in config - should be configurable
 - No retry logic for LLM API calls beyond failover
-- No unified LLM interface abstraction yet
-- Issues use inconsistent naming convention
+- Renderer is just a placeholder stub
+- Issues use inconsistent naming convention (Phase X vs [area] format)
