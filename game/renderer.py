@@ -1,11 +1,19 @@
 import pygame
 import config
+import os
 
 
 class Renderer:
     def __init__(self, screen):
         self.screen = screen
-        self.font = pygame.font.Font(None, 20)
+        self._load_font()
+
+    def _load_font(self):
+        font_path = config.FONT_PATH
+        if os.path.exists(font_path):
+            self.font = pygame.font.Font(font_path, config.FONT_SIZE)
+        else:
+            self.font = pygame.font.Font(None, 16)
 
     def render(self, game_state):
         self.screen.fill(config.BUS_FLOOR_COLOR)
