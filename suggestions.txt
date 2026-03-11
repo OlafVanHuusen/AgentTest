@@ -18,6 +18,11 @@
 - **Phase 5 (Polish)**: 0% complete - Pixel art sprites, visual feedback, debug mode, ambient sound
 - **Phase 6 (Web)**: 0% complete - Pygbag setup, web build, testing, deployment
 
+## Completed Issues
+- Phase 1.4 – Lore Loading
+- Phase 1.5 – Basic Renderer (Placeholder)
+- Phase 3.3 – Groq API Client
+
 ## Suggested Next Priorities
 
 1. **Phase 2 (Visuals)** - Start here as the game needs visuals before LLM integration
