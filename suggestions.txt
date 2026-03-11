@@ -4,19 +4,60 @@
 
 | Status | Count |
 |--------|-------|
-| Completed | 4 |
-| Open | 41 |
+| Completed | 5 |
+| Open | 50 |
 
-**Total Issues**: 45 (4 completed, 41 remaining)
+**Total Issues**: 55 (5 completed, 50 remaining)
 
-## Current Phase Breakdown
+## Current Status by Category
 
-- **Phase 1 (Setup)**: ~100% complete - Project structure, config, lore loading, game state, entry point done
-- **Phase 2 (Visuals)**: 0% complete - Bus interior, NPCs, UI elements, visual states, font
-- **Phase 3 (LLM)**: ~50% complete - Base interface, Groq client, Ollama client done; failover, prompt builder, full integration remain
-- **Phase 4 (Time Loop)**: 0% complete - Time system, loop manager, action tracker, endings
-- **Phase 5 (Polish)**: 0% complete - Pixel art sprites, visual feedback, debug mode, ambient sound
-- **Phase 6 (Web)**: 0% complete - Pygbag setup, web build, testing, deployment
+### Setup (Completed)
+- Project structure and config
+- config.py with game settings
+
+### Lore (In Progress)
+- Lore loading system - DONE
+- npcs.json - DONE  
+- setting.json - DONE
+- endings.json - DONE
+
+### Game (In Progress)
+- Main entry point with game loop - DONE
+- Game state management - DONE
+
+### LLM (Partial)
+- LLM Base Interface - DONE
+- Ollama Client - DONE
+- Groq API Client - DONE
+- Failover Handler - pending
+- Prompt Builder - pending
+- Full Integration - pending
+
+### Visuals (Not Started)
+- Bus Interior
+- NPCs
+- UI Elements
+- Visual States
+- Font
+
+### Time Loop (Not Started)
+- Time System
+- Loop Manager
+- Action Tracker (Consistency)
+- Ending Detection
+- Lightning Effect (LLM Failure)
+
+### Polish (Not Started)
+- Pixel Art Sprites
+- Visual Feedback for Actions
+- Debug Mode
+- Ambient Sound (Optional)
+
+### Web (Not Started)
+- Pygbag Setup
+- Web Build
+- Testing
+- Deployment
 
 ## Completed Issues
 
@@ -24,8 +65,17 @@
 |---------|-------|
 | 171 | Phase 3.3 – Groq API Client |
 | 170 | Phase 3.2 – Ollama Client |
+| 169 | Phase 3.1 – LLM Base Interface |
 | 163 | Phase 1.5 – Basic Renderer (Placeholder) |
 | 162 | Phase 1.4 – Lore Loading |
+| 203 | [lore] Implement lore loading system |
+| 202 | [game] Implement game state management |
+| 201 | [game] Create main entry point with game loop |
+| 200 | [setup] Create project structure and config |
+| 199 | [setup] Create config.py with game settings |
+| 198 | [lore] Create endings.json with 3 endings |
+| 197 | [lore] Create setting.json with bus atmosphere and rules |
+| 196 | [lore] Create npcs.json with detailed NPC definitions |
 
 ## Implemented Code (Verified)
 
@@ -34,28 +84,20 @@
 - game/state.py - Game state management
 - game/lore_loader.py - Lore loading system
 - game/renderer.py - Basic renderer
+- llm/base.py - LLM base interface
 - llm/groq.py - Groq API client
 - llm/ollama.py - Ollama API client
 - lore/endings.json - 3 endings defined
 - lore/npcs.json - NPC definitions
 - lore/setting.json - Bus atmosphere and rules
 
-## Missing/Incomplete
-
-- LLM base interface - Phase 3.1
-- Phase 3.4-3.6 - Failover, prompt builder, full integration
-- All Phase 2 (Visuals) - Bus interior, NPCs, UI
-- All Phase 4 (Time Loop) - Time system, loop manager
-- All Phase 5 (Polish)
-- All Phase 6 (Web)
-
 ## Suggested Next Priorities
 
-1. **Phase 3.1 – LLM Base Interface** - Abstract interface for LLM clients
-2. **Phase 3.4-3.6** - Failover, prompt builder, full integration
-3. **Phase 2 (Visuals)** - Bus interior rendering foundational for gameplay
-4. **Phase 4 (Time Loop)** - Core game mechanic
-5. **Phase 5 (Polish)** - Polish after core mechanics
+1. **Complete LLM Integration** - Failover handler, prompt builder, full integration
+2. **Phase 2 (Visuals)** - Bus interior rendering is foundational for gameplay
+3. **Phase 4 (Time Loop)** - Core game mechanic - time system, loop manager
+4. **Phase 5 (Polish)** - After core mechanics are done
+5. **Phase 6 (Web)** - Optional deployment
 
 ## Identified Gaps
 
@@ -65,6 +107,7 @@
 4. **No CI/CD pipeline**
 5. **Inconsistent issue naming** - Mix of new format and "Phase X" format
 6. **Hardcoded values** - LLM models, settings should be configurable
+7. **Input handler not integrated** - Phase 4.6 not done
 
 ## Ideas for New Features
 
