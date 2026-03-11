@@ -4,16 +4,16 @@
 
 | Status | Count |
 |--------|-------|
-| Completed | 3 |
-| Open | 37 |
+| Completed | 4 |
+| Open | 41 |
 
-**Total Issues**: 40 (3 completed, 37 remaining)
+**Total Issues**: 45 (4 completed, 41 remaining)
 
 ## Current Phase Breakdown
 
-- **Phase 1 (Setup)**: ~86% complete - Project structure, config, lore loading, game state, entry point mostly done
+- **Phase 1 (Setup)**: ~100% complete - Project structure, config, lore loading, game state, entry point done
 - **Phase 2 (Visuals)**: 0% complete - Bus interior, NPCs, UI elements, visual states, font
-- **Phase 3 (LLM)**: ~33% complete - Base interface, Groq client done; Ollama client, failover, prompt builder, full integration remain
+- **Phase 3 (LLM)**: ~50% complete - Base interface, Groq client, Ollama client done; failover, prompt builder, full integration remain
 - **Phase 4 (Time Loop)**: 0% complete - Time system, loop manager, action tracker, endings
 - **Phase 5 (Polish)**: 0% complete - Pixel art sprites, visual feedback, debug mode, ambient sound
 - **Phase 6 (Web)**: 0% complete - Pygbag setup, web build, testing, deployment
@@ -23,6 +23,7 @@
 | Issue # | Title |
 |---------|-------|
 | 171 | Phase 3.3 – Groq API Client |
+| 170 | Phase 3.2 – Ollama Client |
 | 163 | Phase 1.5 – Basic Renderer (Placeholder) |
 | 162 | Phase 1.4 – Lore Loading |
 
@@ -34,14 +35,15 @@
 - game/lore_loader.py - Lore loading system
 - game/renderer.py - Basic renderer
 - llm/groq.py - Groq API client
+- llm/ollama.py - Ollama API client
 - lore/endings.json - 3 endings defined
 - lore/npcs.json - NPC definitions
 - lore/setting.json - Bus atmosphere and rules
 
 ## Missing/Incomplete
 
-- Ollama client (llm/ollama.py) - Phase 3.2
 - LLM base interface - Phase 3.1
+- Phase 3.4-3.6 - Failover, prompt builder, full integration
 - All Phase 2 (Visuals) - Bus interior, NPCs, UI
 - All Phase 4 (Time Loop) - Time system, loop manager
 - All Phase 5 (Polish)
@@ -49,11 +51,11 @@
 
 ## Suggested Next Priorities
 
-1. **Phase 3.2 – Ollama Client** - Complete the LLM client set
-2. **Phase 2 (Visuals)** - Bus interior rendering foundational for gameplay
-3. **Phase 3.1 – LLM Base Interface** - Abstract interface for LLM clients
-4. **Phase 3.4-3.6** - Failover, prompt builder, full integration
-5. **Phase 4 (Time Loop)** - Core game mechanic
+1. **Phase 3.1 – LLM Base Interface** - Abstract interface for LLM clients
+2. **Phase 3.4-3.6** - Failover, prompt builder, full integration
+3. **Phase 2 (Visuals)** - Bus interior rendering foundational for gameplay
+4. **Phase 4 (Time Loop)** - Core game mechanic
+5. **Phase 5 (Polish)** - Polish after core mechanics
 
 ## Identified Gaps
 
@@ -61,7 +63,8 @@
 2. **No audio implementation** - Phase 5.4 marked optional
 3. **No error handling** for malformed lore JSON
 4. **No CI/CD pipeline**
-5. **Hardcoded values** - LLM models, settings should be configurable
+5. **Inconsistent issue naming** - Mix of new format and "Phase X" format
+6. **Hardcoded values** - LLM models, settings should be configurable
 
 ## Ideas for New Features
 
@@ -76,4 +79,6 @@
 
 - DEBUG_MODE = True in config - should be configurable
 - No retry logic for LLM API calls beyond failover
-- Ollama client not yet implemented
+- No unified LLM interface abstraction yet
+- Issues use inconsistent naming convention
+
