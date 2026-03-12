@@ -4,26 +4,25 @@
 
 | Status | Count |
 |--------|-------|
-| Completed | 6 |
-| Open | 30 |
+| Completed | 7 |
+| Open | 35 |
 
-**Total Issues**: 36 (6 completed, 30 remaining)
+**Total Issues**: 42 (7 completed, 35 remaining)
 
 ## Current Status by Category
 
-### Setup (Completed)
-- [x] #200 [setup] Create project structure and config
-- [x] #199 [setup] Create config.py with game settings
+### Setup (Open)
+- [ ] #200 [setup] Create project structure and config
+- [ ] #199 [setup] Create config.py with game settings
 
-### Lore (Completed)
-- [x] #203 [lore] Implement lore loading system
-- [x] #196 [lore] Create npcs.json with detailed NPC definitions
-- [x] #198 [lore] Create endings.json with 3 endings
-- [x] #197 [lore] Create setting.json with bus atmosphere and rules
+### Lore (Open)
+- [ ] #203 [lore] Implement lore loading system
+- [ ] #198 [lore] Create endings.json with 3 endings
+- [ ] #197 [lore] Create setting.json with bus atmosphere and rules
 
-### Game (Completed)
-- [x] #201 [game] Create main entry point with game loop
-- [x] #202 [game] Implement game state management
+### Game (Open)
+- [ ] #202 [game] Implement game state management
+- [ ] #201 [game] Create main entry point with game loop
 
 ### LLM (Partial)
 - [x] #169 Phase 3.1 – LLM Base Interface
@@ -68,10 +67,8 @@
 
 | Issue # | Title |
 |---------|-------|
-| 203 | [lore] Implement lore loading system |
-| 202 | [game] Implement game state management |
-| 201 | [game] Create main entry point with game loop |
 | 196 | [lore] Create npcs.json with detailed NPC definitions |
+| 176 | Phase 4.1 – Time System |
 | 171 | Phase 3.3 – Groq API Client |
 | 170 | Phase 3.2 – Ollama Client |
 | 169 | Phase 3.1 – LLM Base Interface |
@@ -82,10 +79,11 @@
 
 **Core:**
 - config.py - Game settings
-- main.py - Entry point with game loop
+- main.py - Entry point (partially implemented)
 - game/state.py - Game state management
 - game/lore_loader.py - Lore loading system
 - game/renderer.py - Basic renderer
+- game/clock.py - Time system
 
 **LLM:**
 - llm/base.py - LLM base interface
