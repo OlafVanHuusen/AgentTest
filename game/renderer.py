@@ -174,6 +174,12 @@ class Renderer:
     def _draw_ui(self, game_state):
         pygame.draw.rect(self.screen, config.UI_BG_COLOR, (0, 220, 320, 20))
 
+        if game_state.game_over and game_state.ending:
+            self._draw_ending_screen(game_state)
+        else:
+            self._draw_game_ui(game_state)
+
+    def _draw_game_ui(self, game_state):
         time_text = f"02:{game_state.current_minute:02d}"
         loop_text = f"Loop: #{game_state.loop_count}"
 
@@ -182,3 +188,39 @@ class Renderer:
 
         self.screen.blit(time_surface, (5, 222))
         self.screen.blit(loop_surface, (250, 222))
+
+    def _draw_ending_screen(self, game_state):
+        from game.lore_loader import get_lore_loader
+
+        lore_loader = get_lore_loader()
+        ending = lore_loader.get_ending(game_state.ending)
+
+        self.screen.fill((0, 0, 0))
+
+        title = ending.get("name", "Ending") if ending else "Game Over"
+        result = ending.get("result", "The loop has ended.") if ending else ""
+
+        title_surface = self.font.render(title, True, (255, 215, 0))
+        title_rect = title_surface.get_rect(center=(160, 60))
+        self.screen.blit(title_surface, title_rect)
+
+        words = result.split()
+        lines = []
+        current_line = []
+        for word in words:
+            current_line.append(word)
+            if len(" ".join(current_line)) > 35:
+                current_line.pop()
+                lines.append(" ".join(current_line))
+                current_line = [word]
+        if current_line:
+            lines.append(" ".join(current_line))
+
+        for i, line in enumerate(lines):
+            line_surface = self.font.render(line, True, (200, 200, 200))
+            line_rect = line_surface.get_rect(center=(160, 100 + i * 20))
+            self.screen.blit(line_surface, line_rect)
+
+        restart_surface = self.font.render("Press R to restart", True, (150, 150, 150))
+        restart_rect = restart_surface.get_rect(center=(160, 210))
+        self.screen.blit(restart_surface, restart_rect)
