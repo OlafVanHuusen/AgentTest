@@ -25,8 +25,6 @@
 | 201 | [game] Create main entry point with game loop | ✅ DONE (main.py) |
 | 176 | Phase 4.1 – Time System | ✅ DONE (clock.py) |
 | 169 | Phase 3.1 – LLM Base Interface | ✅ DONE |
-| 170 | Phase 3.2 – Ollama Client | ✅ DONE |
-| 171 | Phase 3.3 – Groq API Client | ✅ DONE |
 
 ### Remaining Open Issues (32 total)
 
@@ -42,6 +40,8 @@
 | 166 | Phase 2.3 – UI Elements |
 | 167 | Phase 2.4 – Visual States |
 | 168 | Phase 2.5 – Font |
+| 170 | Phase 3.2 – Ollama Client |
+| 171 | Phase 3.3 – Groq API Client |
 | 172 | Phase 3.4 – Failover Handler |
 | 173 | Phase 3.5 – Prompt Builder |
 | 174 | Phase 3.6 – Full Integration |
@@ -88,36 +88,33 @@
 
 ## Suggested Next Priorities
 
-1. **Phase 1 (Completion)** - Complete remaining Phase 1 items
-   - Lore Loading (issue 162)
-   - Basic Renderer (issue 163)
-   
-2. **Phase 2 (Visuals)** - Start with #164 Bus Interior
+1. **Phase 2 (Visuals)** - Start with #164 Bus Interior
    - Phase 2.1 → 2.2 → 2.3 → 2.4 → 2.5
    - This is foundational before polish
-    
-3. **Phase 3.4-3.7 (LLM Integration)** 
+
+2. **Phase 3.4-3.7 (LLM Integration)** 
    - Failover Handler, Prompt Builder, Full Integration
    - Connect LLM to game state
 
-4. **Phase 4 (Time Loop)** - Core mechanic
+3. **Phase 4 (Time Loop)** - Core mechanic
    - Loop Manager, Action Tracker, Ending Detection
    - Lightning Effect on LLM failure
 
-5. **Phase 5 (Polish)** - After core is working
+4. **Phase 5 (Polish)** - After core is working
 
-6. **Phase 6 (Web)** - Optional deployment
+5. **Phase 6 (Web)** - Optional deployment
 
 ## Identified Gaps
 
-1. **No proper game loop integration** - main.py exists but may not fully integrate all components
+1. **Renderer is placeholder** - game/renderer.py is stub only
 2. **No input handler** - Phase 4.6 not started
-3. **Renderer is placeholder** - game/renderer.py is stub only
-4. **No prompt builder** - Phase 3.5 missing
-5. **No failover handler** - Phase 3.4 missing
-6. **No full LLM-game integration** - Phase 3.6 missing
-7. **Limited tests** - Only LLM integration test exists
-8. **No audio** - Phase 5.4 optional but unimplemented
+3. **No prompt builder** - Phase 3.5 missing
+4. **No failover handler** - Phase 3.4 missing
+5. **No full LLM-game integration** - Phase 3.6 missing
+6. **No pixel art sprites** - Phase 5.1 not implemented
+7. **No visual feedback** - Phase 5.2 not implemented
+8. **Limited tests** - Only LLM integration test exists
+9. **No audio** - Phase 5.4 optional but unimplemented
 
 ## Ideas for New Features
 
@@ -140,13 +137,11 @@
 
 | Category | Completed | Remaining |
 |----------|-----------|-----------|
-| Setup | 2 | 3 |
-| Lore | 5 | 2 |
-| Game | 3 | 3 |
-| LLM | 3 | 4 |
-| Visuals | 5 | 0 |
-| Time Loop | 2 | 4 |
+| Setup | 2 | 2 |
+| Lore | 5 | 0 |
+| Game | 3 | 2 |
+| LLM | 1 | 6 |
+| Visuals | 0 | 5 |
+| Time Loop | 1 | 5 |
 | Polish | 0 | 5 |
 | Web | 0 | 5 |
-
-(End of file - total 139 lines)
