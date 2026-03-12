@@ -185,3 +185,13 @@ class Renderer:
             text_width = self.input_font.size(user_input)[0]
             cursor_x = 10 + text_width
             pygame.draw.line(self.screen, config.INPUT_CURSOR_COLOR, (cursor_x, box_y + 3), (cursor_x, box_y + box_height - 3), 1)
+
+    def trigger_lightning_effect(self):
+        flash_count = 3
+        for _ in range(flash_count):
+            self.screen.fill((255, 255, 255))
+            pygame.display.flip()
+            pygame.time.wait(50)
+            self.screen.fill(config.BUS_FLOOR_COLOR)
+            pygame.display.flip()
+            pygame.time.wait(50)
