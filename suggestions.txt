@@ -4,10 +4,10 @@
 
 | Status | Count |
 |--------|-------|
-| Closed (GitHub) | 13 |
+| Closed (GitHub) | 12 |
 | Open | 23 |
 
-**Total Issues**: 40 (23 open + 13 closed)
+**Total Issues**: 35 (23 open + 12 closed)
 
 ## Verified Implementation Status
 
@@ -147,6 +147,6 @@
 | Polish | 0 | 5 |
 | Web | 0 | 5 |
 
-**Summary**: 17 completed, 23 remaining = 40 total
+**Summary**: 12 completed, 23 remaining = 35 total
 
 (End of file - total 139 lines)
