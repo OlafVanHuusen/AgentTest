@@ -6,7 +6,9 @@ class GameState:
         self.max_actions_per_loop = 10
         self.actions = []
         self.action_results = {}
+        self.world_changes = {}
         self.game_over = False
+        self.ending_triggered = False
         self.ending = None
 
     def advance_time(self):
@@ -33,6 +35,7 @@ class GameState:
         self.actions_this_loop = 0
         self.actions = []
         self.action_results = {}
+        self.world_changes = {}
         self.loop_count += 1
 
     def set_ending(self, ending):
