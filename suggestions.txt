@@ -4,10 +4,10 @@
 
 | Status | Count |
 |--------|-------|
-| Closed (GitHub) | 9 |
-| Open | 42 |
+| Closed (GitHub) | 10 |
+| Open | 32 |
 
-**Total Issues**: 51
+**Total Issues**: 42
 
 ## Verified Implementation Status
 
@@ -28,7 +28,7 @@
 | 170 | Phase 3.2 – Ollama Client | ✅ DONE |
 | 171 | Phase 3.3 – Groq API Client | ✅ DONE |
 
-### Remaining Open Issues (42 total)
+### Remaining Open Issues (32 total)
 
 | Issue # | Title |
 |---------|-------|
@@ -140,12 +140,12 @@
 
 | Category | Completed | Remaining |
 |----------|-----------|-----------|
-| Setup | 2 | 0 |
-| Lore | 5 | 0 |
-| Game | 3 | 0 |
+| Setup | 2 | 3 |
+| Lore | 5 | 2 |
+| Game | 3 | 3 |
 | LLM | 3 | 4 |
-| Visuals | 0 | 5 |
-| Time Loop | 1 | 5 |
+| Visuals | 5 | 0 |
+| Time Loop | 2 | 4 |
 | Polish | 0 | 5 |
 | Web | 0 | 5 |
 
