@@ -5,9 +5,9 @@
 | Status | Count |
 |--------|-------|
 | Closed (GitHub) | 16 |
-| Open | 20 |
+| Open | 26 |
 
-**Total Issues**: 36 (20 open + 16 closed)
+**Total Issues**: 42 (26 open + 16 closed)
 
 ## Current Status
 
@@ -29,12 +29,14 @@
 - Phase 4.2 – Loop Manager
 - Phase 4.6 – Input Handler Integration
 
-### Open Issues (20)
+### Open Issues (26)
 | Issue # | Title |
 |---------|-------|
 | 172 | Phase 3.4 – Failover Handler |
 | 173 | Phase 3.5 – Prompt Builder |
 | 174 | Phase 3.6 – Full Integration |
+| 176 | Phase 4.1 – Time System |
+| 177 | Phase 4.2 – Loop Manager |
 | 178 | Phase 4.3 – Action Tracker (Consistency) |
 | 179 | Phase 4.4 – Ending Detection |
 | 180 | Phase 4.5 – Lightning Effect (LLM Failure) |
@@ -49,6 +51,7 @@
 | 190 | Phase 6.3 – Testing |
 | 191 | Phase 6.4 – Web-Specific Considerations |
 | 192 | Phase 6.5 – Deployment (Optional) |
+| 199 | [setup] Create config.py with game settings |
 | 201 | [game] Create main entry point with game loop |
 | 202 | [game] Implement game state management |
 | 203 | [lore] Implement lore loading system |
@@ -80,7 +83,9 @@
    - Prompt Builder
    - Full Integration
 
-2. **Phase 4.3-4.5 (Time Loop Mechanics)**
+2. **Phase 4.x (Time Loop Mechanics)**
+   - Time System
+   - Loop Manager
    - Action Tracker
    - Ending Detection
    - Lightning Effect
@@ -97,10 +102,11 @@
 1. **No prompt builder** - Phase 3.5 missing
 2. **No failover handler** - Phase 3.4 missing
 3. **No full LLM-game integration** - Phase 3.6 missing
-4. **No Action Tracker** - Phase 4.3 not implemented
-5. **No Ending Detection** - Phase 4.4 not implemented
-6. **Limited tests** - Only LLM integration test exists
-7. **Renderer is placeholder** - needs full implementation
+4. **No Time System** - Phase 4.1 not implemented
+5. **No Action Tracker** - Phase 4.3 not implemented
+6. **No Ending Detection** - Phase 4.4 not implemented
+7. **Limited tests** - Only LLM integration test exists
+8. **Renderer is placeholder** - needs full implementation
 
 ## Ideas for New Features
 
@@ -117,3 +123,5 @@
 - No retry logic for LLM API calls
 - Renderer stub needs full implementation
 - Issues use inconsistent naming (Phase X vs [area] format)
+
+(End of file - total 124 lines)
