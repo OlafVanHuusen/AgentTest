@@ -12,6 +12,7 @@ class Renderer:
     def render(self, game_state):
         self.screen.fill(config.BUS_FLOOR_COLOR)
         self._draw_bus_layout()
+        self._draw_visual_states(game_state.world_changes)
         self._draw_ui(game_state)
         pygame.display.flip()
 
@@ -119,6 +120,56 @@ class Renderer:
         handle_x = door_x + 3
         handle_y = door_y + 15
         pygame.draw.rect(self.screen, config.DOOR_HANDLE_COLOR, (handle_x, handle_y, 3, 6))
+
+    def _draw_visual_states(self, world_changes):
+        if not world_changes:
+            return
+        
+        for change_type, change_data in world_changes.items():
+            if change_type == "window_broken":
+                self._draw_broken_window(change_data)
+            elif change_type == "blood_stain":
+                self._draw_blood_stain(change_data)
+            elif change_type == "item_moved":
+                self._draw_item_moved(change_data)
+            elif change_type == "item_changed":
+                self._draw_item_changed(change_data)
+
+    def _draw_broken_window(self, data):
+        window_index = data.get("window_index", 0)
+        window_positions = {
+            0: (30, 75),
+            1: (75, 75),
+            2: (205, 75),
+            3: (250, 75),
+        }
+        wx, wy = window_positions.get(window_index, (30, 75))
+        
+        pygame.draw.rect(self.screen, config.BROKEN_WINDOW_COLOR, (wx, wy, 35, 45))
+        pygame.draw.rect(self.screen, config.BUS_WALL_COLOR, (wx, wy, 35, 45), 1)
+        
+        crack_lines = [
+            ((wx + 5, wy + 5), (wx + 20, wy + 25)),
+            ((wx + 20, wy + 25), (wx + 30, wy + 10)),
+            ((wx + 10, wy + 30), (wx + 25, wy + 40)),
+        ]
+        for start, end in crack_lines:
+            pygame.draw.line(self.screen, config.CRACK_COLOR, start, end, 1)
+
+    def _draw_blood_stain(self, data):
+        x = data.get("x", 0)
+        y = data.get("y", 0)
+        size = data.get("size", 20)
+        
+        stain_surface = pygame.Surface((size, size), pygame.SRCALPHA)
+        pygame.draw.circle(stain_surface, (*config.BLOOD_STAIN_COLOR, config.BLOOD_STAIN_ALPHA), (size // 2, size // 2), size // 2)
+        self.screen.blit(stain_surface, (x, y))
+
+    def _draw_item_moved(self, data):
+        pass
+
+    def _draw_item_changed(self, data):
+        pass
 
     def _draw_ui(self, game_state):
         pygame.draw.rect(self.screen, config.UI_BG_COLOR, (0, 220, 320, 20))
