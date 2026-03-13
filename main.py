@@ -15,6 +15,8 @@ def main():
     screen = pygame.display.set_mode((scaled_width, scaled_height))
     pygame.display.set_caption("Timeloop Bus")
     
+    clock = pygame.time.Clock()
+    
     game_state = GameState()
     renderer = Renderer(screen)
     input_handler = InputHandler(screen)
@@ -36,7 +38,7 @@ def main():
         if loop_manager.is_effect_active():
             loop_manager.render_effect()
         
-        pygame.time.wait(50)
+        clock.tick(60)
     
     pygame.quit()
 
