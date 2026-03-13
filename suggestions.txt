@@ -4,22 +4,22 @@
 
 | Status | Count |
 |--------|-------|
-| Closed (GitHub) | 12 |
-| Open | 30 |
+| Closed (GitHub) | 16 |
+| Open | 26 |
 
-**Total Issues**: 42 (30 open + 12 closed)
+**Total Issues**: 42 (26 open + 16 closed)
 
-## Implemented Code (Verified - but issues not closed)
+## Implemented Code (Verified - issues not all closed)
 
-**Note**: These files exist in the codebase but the corresponding GitHub issues are still open. Code is functional but issues need to be closed.
+**Note**: These files exist in the codebase. Some corresponding GitHub issues are still open despite code existing.
 
 | Issue # | Title | Status |
 |---------|-------|--------|
+| 196 | [lore] Create npcs.json with detailed NPC definitions | ✅ CODE EXISTS (issue closed) |
 | 199 | [setup] Create config.py with game settings | ✅ CODE EXISTS |
 | 200 | [setup] Create project structure and config | ✅ CODE EXISTS |
 | 197 | [lore] Create setting.json with bus atmosphere and rules | ✅ CODE EXISTS |
 | 198 | [lore] Create endings.json with 3 endings | ✅ CODE EXISTS |
-| 196 | [lore] Create npcs.json with detailed NPC definitions | ✅ CODE EXISTS (issue closed) |
 | 203 | [lore] Implement lore loading system | ✅ CODE EXISTS (lore_loader.py) |
 | 202 | [game] Implement game state management | ✅ CODE EXISTS (state.py) |
 | 201 | [game] Create main entry point with game loop | ✅ CODE EXISTS (main.py) |
@@ -32,20 +32,21 @@
 | 164 | Phase 2.1 – Bus Interior | ✅ CODE EXISTS |
 | 165 | Phase 2.2 – NPCs | ✅ CODE EXISTS |
 | 166 | Phase 2.3 – UI Elements | ✅ CODE EXISTS |
+| 167 | Phase 2.4 – Visual States | ✅ CODE EXISTS |
+| 168 | Phase 2.5 – Font | ✅ CODE EXISTS |
 | 177 | Phase 4.2 – Loop Manager | ✅ CODE EXISTS (issue closed) |
 
-### Remaining Open Issues (30 total)
+### Remaining Open Issues (26 total)
 
 | Issue # | Title |
 |---------|-------|
 | 159 | Phase 1.1 – Project Setup |
 | 160 | Phase 1.2 – Main Entry Point |
 | 161 | Phase 1.3 – Game State |
-| 167 | Phase 2.4 – Visual States |
-| 168 | Phase 2.5 – Font |
 | 172 | Phase 3.4 – Failover Handler |
 | 173 | Phase 3.5 – Prompt Builder |
 | 174 | Phase 3.6 – Full Integration |
+| 175 | Phase 3.7 – Testing |
 | 178 | Phase 4.3 – Action Tracker (Consistency) |
 | 179 | Phase 4.4 – Ending Detection |
 | 180 | Phase 4.5 – Lightning Effect (LLM Failure) |
@@ -147,14 +148,14 @@
 | Category | Implemented (not closed) | Open (needs work) |
 |----------|--------------------------|-------------------|
 | Setup | 2 | 1 |
-| Lore | 3 | 2 |
-| Game | 2 | 1 |
-| LLM | 3 | 1 |
-| Visuals | 3 | 2 |
-| Time Loop | 2 | 1 |
+| Lore | 3 | 3 |
+| Game | 2 | 2 |
+| LLM | 3 | 2 |
+| Visuals | 5 | 2 |
+| Time Loop | 2 | 2 |
 | Polish | 0 | 5 |
 | Web | 0 | 5 |
 
-**Summary**: 12 completed, 30 remaining = 42 total
+**Summary**: 16 completed, 26 remaining = 42 total
 
 (End of file - total 139 lines)
