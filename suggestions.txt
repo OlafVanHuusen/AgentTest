@@ -4,14 +4,14 @@
 
 | Status | Count |
 |--------|-------|
-| Closed (GitHub) | 17 |
+| Closed (GitHub) | 18 |
 | Open | 24 |
 
-**Total Issues**: 41 (24 open + 17 closed)
+**Total Issues**: 42 (24 open + 18 closed)
 
 ## Current Status
 
-### Completed (Closed Issues - 17)
+### Completed (Closed Issues - 18)
 - Phase 1.1 – Project Setup
 - Phase 1.2 – Main Entry Point
 - Phase 1.3 – Game State
@@ -25,14 +25,24 @@
 - Phase 3.1 – LLM Base Interface
 - Phase 3.2 – Ollama Client
 - Phase 3.3 – Groq API Client
+- Phase 3.4 – Failover Handler
+- Phase 3.5 – Prompt Builder
 - Phase 3.7 – Testing
 - Phase 4.1 – Time System
 - Phase 4.2 – Loop Manager
-- Phase 4.6 – Input Handler Integration
 
 ### Open Issues (24)
 | Issue # | Title |
 |---------|-------|
+| 161 | Phase 1.3 – Game State |
+| 163 | Phase 1.5 – Basic Renderer (Placeholder) |
+| 164 | Phase 1.4 – Lore Loading |
+| 165 | Phase 2.1 – Bus Interior |
+| 166 | Phase 2.2 – NPCs |
+| 167 | Phase 2.3 – UI Elements |
+| 168 | Phase 2.4 – Visual States |
+| 169 | Phase 2.5 – Font |
+| 170 | Phase 3.1 – LLM Base Interface |
 | 172 | Phase 3.4 – Failover Handler |
 | 173 | Phase 3.5 – Prompt Builder |
 | 174 | Phase 3.6 – Full Integration |
@@ -65,31 +75,37 @@
 - game/state.py - GameState class
 - game/lore_loader.py - Lore loading system
 - game/clock.py - Time advancement
-- game/renderer.py - Basic renderer stub
+- game/renderer.py - Full renderer implementation
+- game/action_tracker.py - Action tracking for consistency
+- game/loop_manager.py - Time loop management
+- game/input_handler.py - Input handling
 
 **LLM:**
 - llm/base.py - LLM base interface
 - llm/groq.py - Groq API client
 - llm/ollama.py - Ollama API client
+- llm/failover.py - Failover handler
+- llm/prompt_builder.py - Prompt builder
 
 **Lore:**
 - lore/endings.json - 3 endings
 - lore/npcs.json - 15 NPCs
 - lore/setting.json - Bus atmosphere
 
+**Tests:**
+- tests/llm_integration.py - LLM tests
+
 ## Suggested Next Priorities
 
-1. **Phase 3.4-3.6 (LLM Integration)** - Core blocking item
-   - Failover Handler
-   - Prompt Builder
-   - Full Integration
+1. **Phase 3.6 (Full Integration)** - Connect LLM to game
+   - Wire prompt builder to LLM clients
+   - Connect game actions to LLM queries
+   - Test end-to-end LLM gameplay
 
 2. **Phase 4.x (Time Loop Mechanics)**
-   - Time System
-   - Loop Manager
-   - Action Tracker
+   - Action Tracker (Consistency)
    - Ending Detection
-   - Lightning Effect
+   - Lightning Effect (LLM Failure)
 
 3. **Phase 5 (Polish)** - After core mechanics work
    - Pixel Art Sprites
@@ -100,14 +116,11 @@
 
 ## Identified Gaps
 
-1. **No prompt builder** - Phase 3.5 missing
-2. **No failover handler** - Phase 3.4 missing
-3. **No full LLM-game integration** - Phase 3.6 missing
-4. **No Time System** - Phase 4.1 not implemented
-5. **No Action Tracker** - Phase 4.3 not implemented
-6. **No Ending Detection** - Phase 4.4 not implemented
-7. **Limited tests** - Only LLM integration test exists
-8. **Renderer is placeholder** - needs full implementation
+1. **No full LLM-game integration** - Phase 3.6 missing
+2. **Limited tests** - Only LLM integration test exists
+3. **No audio** - Ambient sound (optional) not implemented
+4. **No pixel art** - Sprites not created (optional)
+5. **No debug mode** - Phase 5.3 not implemented
 
 ## Ideas for New Features
 
@@ -120,9 +133,8 @@
 
 ## Technical Debt
 
-- Hardcoded model names - should be configurable
-- No retry logic for LLM API calls
-- Renderer stub needs full implementation
 - Issues use inconsistent naming (Phase X vs [area] format)
+- Some Phase items may be completed but not closed
+- Need full integration testing
 
-(End of file - total 124 lines)
+(End of file)
