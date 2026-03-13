@@ -125,15 +125,17 @@ class Renderer:
         if not world_changes:
             return
         
-        for change_type, change_data in world_changes.items():
-            if change_type == "window_broken":
+        for change_key, change_data in world_changes.items():
+            if change_key.startswith("window_broken"):
                 self._draw_broken_window(change_data)
-            elif change_type == "blood_stain":
+            elif change_key.startswith("blood_stain"):
                 self._draw_blood_stain(change_data)
-            elif change_type == "item_moved":
+            elif change_key.startswith("item_moved"):
                 self._draw_item_moved(change_data)
-            elif change_type == "item_changed":
+            elif change_key.startswith("item_changed"):
                 self._draw_item_changed(change_data)
+            elif change_key.startswith("fire_on_bus"):
+                self._draw_fire(change_data)
 
     def _draw_broken_window(self, data):
         window_index = data.get("window_index", 0)
@@ -170,6 +172,17 @@ class Renderer:
 
     def _draw_item_changed(self, data):
         pass
+
+    def _draw_fire(self, data):
+        x = data.get("x", 0)
+        y = data.get("y", 0)
+        intensity = data.get("intensity", 1)
+        
+        fire_colors = [(255, 100, 0), (255, 50, 0), (200, 0, 0)]
+        for i, color in enumerate(fire_colors):
+            size = 15 - i * 3
+            offset_y = i * 5
+            pygame.draw.circle(self.screen, color, (x + 10, y + offset_y), size * intensity // 2)
 
     def _draw_ui(self, game_state):
         pygame.draw.rect(self.screen, config.UI_BG_COLOR, (0, 220, 320, 20))

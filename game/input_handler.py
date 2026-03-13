@@ -43,6 +43,8 @@ class InputHandler:
 
             game_state.add_action(action_text, response)
 
+            self._parse_world_changes(action_text, response, game_state)
+
             should_reset = loop_manager.check_and_trigger_loop_reset(game_state)
             if not should_reset:
                 game_state.advance_time()
@@ -116,6 +118,39 @@ Respond with a descriptive, atmospheric response (2-4 sentences) that follows th
                 game_state.set_ending(ending)
                 self.response_text = ending.get("result", response)
                 break
+
+    def _parse_world_changes(self, action_text, response, game_state):
+        action_lower = action_text.lower()
+        response_lower = response.lower()
+        combined = action_lower + " " + response_lower
+
+        if "window" in combined and ("smash" in combined or "break" in combined or "shatter" in combined):
+            window_index = 0
+            if "right" in combined:
+                window_index = 2 if "front" in combined or "first" in combined else 3
+            else:
+                window_index = 0 if "front" in combined or "first" in combined else 1
+            game_state.world_changes[f"window_broken_{window_index}"] = {"window_index": window_index}
+
+        npc_names = {
+            "alex": ["alex", "boy", "teenager", "kid"],
+            "maria": ["maria", "woman", "girl"],
+            "emo": ["emo", "boy", "goth"],
+            "driver": ["driver", "driver_man"],
+        }
+
+        for npc_id, names in npc_names.items():
+            for name in names:
+                if name in combined and ("kill" in combined or "murder" in combined or "stab" in combined or "attack" in combined or "harm" in combined):
+                    game_state.world_changes[f"{npc_id}_dead"] = {"npc_id": npc_id, "x": 50 + hash(npc_id) % 200, "y": 100 + hash(npc_id) % 50}
+                    game_state.world_changes[f"blood_stain_{npc_id}"] = {"x": 50 + hash(npc_id) % 200, "y": 100 + hash(npc_id) % 50, "size": 25}
+                    break
+
+        if "fire" in combined or "burn" in combined:
+            game_state.world_changes["fire_on_bus"] = {"x": 150, "y": 100, "intensity": 1}
+
+        if "blood" in combined or "bleed" in combined:
+            game_state.world_changes["blood_stain_generic"] = {"x": 100, "y": 120, "size": 20}
 
     def render(self, game_state):
         pygame.draw.rect(self.screen, config.UI_BG_COLOR, self.input_rect)
