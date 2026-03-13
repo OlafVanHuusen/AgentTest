@@ -4,47 +4,34 @@
 
 | Status | Count |
 |--------|-------|
-| Closed (GitHub) | 15 |
-| Open | 27 |
+| Closed (GitHub) | 16 |
+| Open | 20 |
 
-**Total Issues**: 42 (27 open + 15 closed)
+**Total Issues**: 36 (20 open + 16 closed)
 
-## Implemented Code (Verified - issues not all closed)
+## Current Status
 
-**Note**: These files exist in the codebase. Some corresponding GitHub issues are still open despite code existing.
+### Completed (Closed Issues - 16)
+- Phase 1.1 – Project Setup
+- Phase 1.2 – Main Entry Point
+- Phase 1.3 – Game State
+- Phase 1.4 – Lore Loading
+- Phase 1.5 – Basic Renderer (Placeholder)
+- Phase 2.1 – Bus Interior
+- Phase 2.2 – NPCs
+- Phase 2.3 – UI Elements
+- Phase 2.4 – Visual States
+- Phase 2.5 – Font
+- Phase 3.1 – LLM Base Interface
+- Phase 3.2 – Ollama Client
+- Phase 3.3 – Groq API Client
+- Phase 3.7 – Testing
+- Phase 4.2 – Loop Manager
+- Phase 4.6 – Input Handler Integration
 
-| Issue # | Title | Status |
-|---------|-------|--------|
-| 196 | [lore] Create npcs.json with detailed NPC definitions | ✅ CODE EXISTS (issue closed) |
-| 199 | [setup] Create config.py with game settings | ✅ CODE EXISTS |
-| 200 | [setup] Create project structure and config | ✅ CODE EXISTS |
-| 197 | [lore] Create setting.json with bus atmosphere and rules | ✅ CODE EXISTS |
-| 198 | [lore] Create endings.json with 3 endings | ✅ CODE EXISTS |
-| 203 | [lore] Implement lore loading system | ✅ CODE EXISTS (lore_loader.py) |
-| 202 | [game] Implement game state management | ✅ CODE EXISTS (state.py) |
-| 201 | [game] Create main entry point with game loop | ✅ CODE EXISTS (main.py) |
-| 176 | Phase 4.1 – Time System | ✅ CODE EXISTS (clock.py) |
-| 169 | Phase 3.1 – LLM Base Interface | ✅ CODE EXISTS |
-| 170 | Phase 3.2 – Ollama Client | ✅ CODE EXISTS |
-| 171 | Phase 3.3 – Groq API Client | ✅ CODE EXISTS |
-| 162 | Phase 1.4 – Lore Loading | ✅ CODE EXISTS |
-| 163 | Phase 1.5 – Basic Renderer (Placeholder) | ✅ CODE EXISTS |
-| 164 | Phase 2.1 – Bus Interior | ✅ CODE EXISTS |
-| 165 | Phase 2.2 – NPCs | ✅ CODE EXISTS |
-| 166 | Phase 2.3 – UI Elements | ✅ CODE EXISTS |
-| 167 | Phase 2.4 – Visual States | ✅ CODE EXISTS |
-| 168 | Phase 2.5 – Font | ✅ CODE EXISTS |
-| 177 | Phase 4.2 – Loop Manager | ✅ CODE EXISTS (issue closed) |
-| 181 | Phase 4.6 – Input Handler Integration | ✅ CODE EXISTS (issue closed) |
-| 175 | Phase 3.7 – Testing | ✅ CODE EXISTS (issue closed) |
-
-### Remaining Open Issues (27 total)
-
+### Open Issues (20)
 | Issue # | Title |
 |---------|-------|
-| 159 | Phase 1.1 – Project Setup |
-| 160 | Phase 1.2 – Main Entry Point |
-| 161 | Phase 1.3 – Game State |
 | 172 | Phase 3.4 – Failover Handler |
 | 173 | Phase 3.5 – Prompt Builder |
 | 174 | Phase 3.6 – Full Integration |
@@ -62,20 +49,16 @@
 | 190 | Phase 6.3 – Testing |
 | 191 | Phase 6.4 – Web-Specific Considerations |
 | 192 | Phase 6.5 – Deployment (Optional) |
-| 197 | [lore] Create setting.json with bus atmosphere and rules |
-| 198 | [lore] Create endings.json with 3 endings |
-| 199 | [setup] Create config.py with game settings |
-| 200 | [setup] Create project structure and config |
 | 201 | [game] Create main entry point with game loop |
 | 202 | [game] Implement game state management |
 | 203 | [lore] Implement lore loading system |
 
-## Implemented Code (Verified)
+## Code That Exists (Verified)
 
 **Core:**
-- config.py - Game settings (SCREEN, LLM, colors)
+- config.py - Game settings
 - main.py - Entry point with game loop
-- game/state.py - GameState class with loop_count, actions, endings
+- game/state.py - GameState class
 - game/lore_loader.py - Lore loading system
 - game/clock.py - Time advancement
 - game/renderer.py - Basic renderer stub
@@ -86,89 +69,51 @@
 - llm/ollama.py - Ollama API client
 
 **Lore:**
-- lore/endings.json - 3 endings defined
-- lore/npcs.json - 15 NPC definitions
-- lore/setting.json - Bus atmosphere and rules
-
-**Tests:**
-- tests/test_llm_integration.py - LLM integration tests
+- lore/endings.json - 3 endings
+- lore/npcs.json - 15 NPCs
+- lore/setting.json - Bus atmosphere
 
 ## Suggested Next Priorities
 
-1. **Phase 1 (Completion)** - Complete remaining Phase 1 items
-   - These should be closed since code exists: Project Setup, Main Entry Point, Game State
-   
-2. **Phase 3 (LLM Integration)** - Priority after Phase 1
-   - Failover Handler (Phase 3.4)
-   - Prompt Builder (Phase 3.5)
-   - Full Integration (Phase 3.6)
+1. **Phase 3.4-3.6 (LLM Integration)** - Core blocking item
+   - Failover Handler
+   - Prompt Builder
+   - Full Integration
 
-3. **Phase 4 (Time Loop)** - Core mechanic
-   - Action Tracker (Phase 4.3)
-   - Ending Detection (Phase 4.4)
-   - Lightning Effect on LLM failure (Phase 4.5)
+2. **Phase 4.3-4.5 (Time Loop Mechanics)**
+   - Action Tracker
+   - Ending Detection
+   - Lightning Effect
 
-4. **Phase 2 (Visuals)** - Should be completed
-   - Bus Interior, NPCs, UI Elements, Visual States, Font - all have code
+3. **Phase 5 (Polish)** - After core mechanics work
+   - Pixel Art Sprites
+   - Visual Feedback
+   - Debug Mode
 
-5. **Phase 5 (Polish)** - After core is working
-   - Pixel Art Sprites, Visual Feedback, Debug Mode, Ambient Sound, UI Polish
-
-6. **Phase 6 (Web)** - Optional deployment
+4. **Phase 6 (Web)** - Optional deployment
 
 ## Identified Gaps
 
-1. **Many Phase 1-2 issues still open** - Code exists but issues not closed
-2. **No input handler** - Phase 4.6 already closed, may need verification
-3. **Renderer is placeholder** - game/renderer.py is stub only
-4. **No prompt builder** - Phase 3.5 missing
-5. **No failover handler** - Phase 3.4 missing
-6. **No full LLM-game integration** - Phase 3.6 missing
-7. **Limited tests** - Only LLM integration test exists
-8. **No audio** - Phase 5.4 optional but unimplemented
-9. **No Action Tracker** - Phase 4.3 not implemented
-10. **No Ending Detection** - Phase 4.4 not implemented
+1. **No prompt builder** - Phase 3.5 missing
+2. **No failover handler** - Phase 3.4 missing
+3. **No full LLM-game integration** - Phase 3.6 missing
+4. **No Action Tracker** - Phase 4.3 not implemented
+5. **No Ending Detection** - Phase 4.4 not implemented
+6. **Limited tests** - Only LLM integration test exists
+7. **Renderer is placeholder** - needs full implementation
 
 ## Ideas for New Features
 
-1. Multiple Routes - Branching narrative beyond 3 endings
-2. Achievement System - Track discoveries and loop counts
-3. Speedrun Timer - Fastest escape tracking
-4. More LLM Models - Claude, GPT support
-5. Save/Load System - Persist progress
-6. Commentary Mode - LLM narrates player actions
-7. Multiplayer - Two players on same bus
-8. Random Events - Time anomalies, special NPCs
+1. Achievement System - Track discoveries and loop counts
+2. Speedrun Timer - Fastest escape tracking
+3. More LLM Models - Claude, GPT support
+4. Save/Load System - Persist progress
+5. Commentary Mode - LLM narrates player actions
+6. Random Events - Time anomalies, special NPCs
 
 ## Technical Debt
 
-- DEBUG_MODE = True in config - should be environment-based
-- Hardcoded model names (llama3.2:7b) - should be configurable
+- Hardcoded model names - should be configurable
 - No retry logic for LLM API calls
 - Renderer stub needs full implementation
 - Issues use inconsistent naming (Phase X vs [area] format)
-
-## Progress by Category
-
-| Category | Implemented (not closed) | Open (needs work) |
-|----------|--------------------------|-------------------|
-| Setup | 2 | 1 |
-| Lore | 3 | 3 |
-| Game | 2 | 2 |
-| LLM | 3 | 2 |
-| Visuals | 5 | 2 |
-| Time Loop | 2 | 3 |
-| Polish | 0 | 5 |
-| Web | 0 | 5 |
-
-**Summary**: 15 completed, 27 remaining = 42 total
-
-## Recommended Actions
-
-1. Close Phase 1 issues (159-161) since core code exists
-2. Close Phase 2 issues (164-168) since visual code exists
-3. Focus on completing Phase 3 LLM integration before Phase 4
-4. Add more tests beyond LLM integration
-5. Implement renderer stub for actual visuals
-
-(End of file - total 170 lines)
