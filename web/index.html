@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Timeloop Bus</title>
+    <style>
+        body {
+            background-color: #1a1a2e;
+            color: #eee;
+            font-family: 'Courier New', monospace;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        #canvas-container {
+            border: 4px solid #4a4a6a;
+            image-rendering: pixelated;
+        }
+        canvas {
+            display: block;
+        }
+        .loading {
+            margin-top: 20px;
+            color: #888;
+        }
+    </style>
+    <script src="https://pygbag.github.io/pygbag/js/loader.js"></script>
+</head>
+<body>
+    <div id="canvas-container">
+        <canvas id="pygame-canvas" width="640" height="480"></canvas>
+    </div>
+    <div class="loading">Loading Timeloop Bus...</div>
+    <script>
+        // Pygbag will auto-detect and run main.py
+    </script>
+</body>
+</html>
