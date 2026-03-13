@@ -4,10 +4,10 @@
 
 | Status | Count |
 |--------|-------|
-| Closed (GitHub) | 16 |
-| Open | 26 |
+| Closed (GitHub) | 14 |
+| Open | 32 |
 
-**Total Issues**: 42 (26 open + 16 closed)
+**Total Issues**: 46 (32 open + 14 closed)
 
 ## Implemented Code (Verified - issues not all closed)
 
@@ -36,7 +36,7 @@
 | 168 | Phase 2.5 – Font | ✅ CODE EXISTS |
 | 177 | Phase 4.2 – Loop Manager | ✅ CODE EXISTS (issue closed) |
 
-### Remaining Open Issues (26 total)
+### Remaining Open Issues (32 total)
 
 | Issue # | Title |
 |---------|-------|
@@ -46,11 +46,9 @@
 | 172 | Phase 3.4 – Failover Handler |
 | 173 | Phase 3.5 – Prompt Builder |
 | 174 | Phase 3.6 – Full Integration |
-| 175 | Phase 3.7 – Testing |
 | 178 | Phase 4.3 – Action Tracker (Consistency) |
 | 179 | Phase 4.4 – Ending Detection |
 | 180 | Phase 4.5 – Lightning Effect (LLM Failure) |
-| 181 | Phase 4.6 – Input Handler Integration |
 | 182 | Phase 5.1 – Pixel Art Sprites |
 | 183 | Phase 5.2 – Visual Feedback for Actions |
 | 184 | Phase 5.3 – Debug Mode |
@@ -156,6 +154,6 @@
 | Polish | 0 | 5 |
 | Web | 0 | 5 |
 
-**Summary**: 16 completed, 26 remaining = 42 total
+**Summary**: 14 completed, 32 remaining = 46 total
 
 (End of file - total 139 lines)
