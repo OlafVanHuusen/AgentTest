@@ -5,35 +5,36 @@
 | Status | Count |
 |--------|-------|
 | Closed (GitHub) | 12 |
-| Open | 23 |
+| Open | 30 |
 
-**Total Issues**: 35 (23 open + 12 closed)
+**Total Issues**: 42 (30 open + 12 closed)
 
-## Verified Implementation Status
+## Implemented Code (Verified - but issues not closed)
 
-### Completed (Verified in Code)
+**Note**: These files exist in the codebase but the corresponding GitHub issues are still open. Code is functional but issues need to be closed.
 
 | Issue # | Title | Status |
 |---------|-------|--------|
-| 199 | [setup] Create config.py with game settings | ✅ DONE |
-| 200 | [setup] Create project structure and config | ✅ DONE |
-| 197 | [lore] Create setting.json with bus atmosphere and rules | ✅ DONE |
-| 198 | [lore] Create endings.json with 3 endings | ✅ DONE |
-| 196 | [lore] Create npcs.json with detailed NPC definitions | ✅ DONE |
-| 203 | [lore] Implement lore loading system | ✅ DONE (lore_loader.py) |
-| 202 | [game] Implement game state management | ✅ DONE (state.py) |
-| 201 | [game] Create main entry point with game loop | ✅ DONE (main.py) |
-| 176 | Phase 4.1 – Time System | ✅ DONE (clock.py) |
-| 169 | Phase 3.1 – LLM Base Interface | ✅ DONE |
-| 170 | Phase 3.2 – Ollama Client | ✅ DONE |
-| 171 | Phase 3.3 – Groq API Client | ✅ DONE |
-| 162 | Phase 1.4 – Lore Loading | ✅ DONE |
-| 163 | Phase 1.5 – Basic Renderer (Placeholder) | ✅ DONE |
-| 164 | Phase 2.1 – Bus Interior | ✅ DONE |
-| 165 | Phase 2.2 – NPCs | ✅ DONE |
-| 166 | Phase 2.3 – UI Elements | ✅ DONE |
+| 199 | [setup] Create config.py with game settings | ✅ CODE EXISTS |
+| 200 | [setup] Create project structure and config | ✅ CODE EXISTS |
+| 197 | [lore] Create setting.json with bus atmosphere and rules | ✅ CODE EXISTS |
+| 198 | [lore] Create endings.json with 3 endings | ✅ CODE EXISTS |
+| 196 | [lore] Create npcs.json with detailed NPC definitions | ✅ CODE EXISTS (issue closed) |
+| 203 | [lore] Implement lore loading system | ✅ CODE EXISTS (lore_loader.py) |
+| 202 | [game] Implement game state management | ✅ CODE EXISTS (state.py) |
+| 201 | [game] Create main entry point with game loop | ✅ CODE EXISTS (main.py) |
+| 176 | Phase 4.1 – Time System | ✅ CODE EXISTS (clock.py) |
+| 169 | Phase 3.1 – LLM Base Interface | ✅ CODE EXISTS |
+| 170 | Phase 3.2 – Ollama Client | ✅ CODE EXISTS |
+| 171 | Phase 3.3 – Groq API Client | ✅ CODE EXISTS |
+| 162 | Phase 1.4 – Lore Loading | ✅ CODE EXISTS |
+| 163 | Phase 1.5 – Basic Renderer (Placeholder) | ✅ CODE EXISTS |
+| 164 | Phase 2.1 – Bus Interior | ✅ CODE EXISTS |
+| 165 | Phase 2.2 – NPCs | ✅ CODE EXISTS |
+| 166 | Phase 2.3 – UI Elements | ✅ CODE EXISTS |
+| 177 | Phase 4.2 – Loop Manager | ✅ CODE EXISTS (issue closed) |
 
-### Remaining Open Issues (23 total)
+### Remaining Open Issues (30 total)
 
 | Issue # | Title |
 |---------|-------|
@@ -60,6 +61,13 @@
 | 190 | Phase 6.3 – Testing |
 | 191 | Phase 6.4 – Web-Specific Considerations |
 | 192 | Phase 6.5 – Deployment (Optional) |
+| 197 | [lore] Create setting.json with bus atmosphere and rules |
+| 198 | [lore] Create endings.json with 3 endings |
+| 199 | [setup] Create config.py with game settings |
+| 200 | [setup] Create project structure and config |
+| 201 | [game] Create main entry point with game loop |
+| 202 | [game] Implement game state management |
+| 203 | [lore] Implement lore loading system |
 
 ## Implemented Code (Verified)
 
@@ -136,17 +144,17 @@
 
 ## Progress by Category
 
-| Category | Completed | Remaining |
-|----------|-----------|-----------|
+| Category | Implemented (not closed) | Open (needs work) |
+|----------|--------------------------|-------------------|
 | Setup | 2 | 1 |
-| Lore | 4 | 1 |
+| Lore | 3 | 2 |
 | Game | 2 | 1 |
 | LLM | 3 | 1 |
-| Visuals | 5 | 2 |
-| Time Loop | 1 | 3 |
+| Visuals | 3 | 2 |
+| Time Loop | 2 | 1 |
 | Polish | 0 | 5 |
 | Web | 0 | 5 |
 
-**Summary**: 12 completed, 23 remaining = 35 total
+**Summary**: 12 completed, 30 remaining = 42 total
 
 (End of file - total 139 lines)
