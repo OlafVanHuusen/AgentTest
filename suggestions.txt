@@ -4,10 +4,10 @@
 
 | Status | Count |
 |--------|-------|
-| Closed (GitHub) | 14 |
-| Open | 28 |
+| Closed (GitHub) | 15 |
+| Open | 27 |
 
-**Total Issues**: 42 (28 open + 14 closed)
+**Total Issues**: 42 (27 open + 15 closed)
 
 ## Implemented Code (Verified - issues not all closed)
 
@@ -38,7 +38,7 @@
 | 181 | Phase 4.6 – Input Handler Integration | ✅ CODE EXISTS (issue closed) |
 | 175 | Phase 3.7 – Testing | ✅ CODE EXISTS (issue closed) |
 
-### Remaining Open Issues (28 total)
+### Remaining Open Issues (27 total)
 
 | Issue # | Title |
 |---------|-------|
@@ -161,7 +161,7 @@
 | Polish | 0 | 5 |
 | Web | 0 | 5 |
 
-**Summary**: 14 completed, 28 remaining = 42 total
+**Summary**: 15 completed, 27 remaining = 42 total
 
 ## Recommended Actions
 
