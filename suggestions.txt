@@ -5,9 +5,9 @@
 | Status | Count |
 |--------|-------|
 | Closed (GitHub) | 14 |
-| Open | 30 |
+| Open | 28 |
 
-**Total Issues**: 44 (30 open + 14 closed)
+**Total Issues**: 42 (28 open + 14 closed)
 
 ## Implemented Code (Verified - issues not all closed)
 
@@ -38,7 +38,7 @@
 | 181 | Phase 4.6 – Input Handler Integration | ✅ CODE EXISTS (issue closed) |
 | 175 | Phase 3.7 – Testing | ✅ CODE EXISTS (issue closed) |
 
-### Remaining Open Issues (30 total)
+### Remaining Open Issues (28 total)
 
 | Issue # | Title |
 |---------|-------|
@@ -157,11 +157,11 @@
 | Game | 2 | 2 |
 | LLM | 3 | 2 |
 | Visuals | 5 | 2 |
-| Time Loop | 2 | 2 |
+| Time Loop | 2 | 3 |
 | Polish | 0 | 5 |
 | Web | 0 | 5 |
 
-**Summary**: 14 completed, 30 remaining = 44 total
+**Summary**: 14 completed, 28 remaining = 42 total
 
 ## Recommended Actions
 
