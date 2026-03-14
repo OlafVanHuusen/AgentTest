@@ -1,5 +1,6 @@
 import pygame
 import config
+import time
 from llm import ollama, groq
 from game.lore_loader import get_lore_loader
 
@@ -14,6 +15,8 @@ class InputHandler:
         self.font = pygame.font.Font(None, 16)
         self.input_rect = pygame.Rect(10, 200, 240, 20)
         self.active = True
+        self._last_llm_timing = None
+        self._last_llm_used = None
 
     def handle_event(self, event, game_state, loop_manager):
         if not self.active or game_state.game_over:
@@ -38,7 +41,20 @@ class InputHandler:
 
         try:
             prompt = self._build_prompt(action_text, game_state)
-            response = self._send_to_llm(prompt)
+            
+            if config.DEBUG_MODE and config.LOG_PROMPTS:
+                print(f"\n=== DEBUG: PROMPT ===\n{prompt}\n")
+            
+            start_time = time.time()
+            response, llm_used = self._send_to_llm(prompt)
+            elapsed = time.time() - start_time
+            
+            self._last_llm_timing = elapsed
+            self._last_llm_used = llm_used
+            
+            if config.DEBUG_MODE:
+                print(f"\n=== DEBUG: LLM RESPONSE ===\nLLM Used: {llm_used}\nTime: {elapsed:.2f}s\nResponse: {response}\n")
+            
             self.response_text = response
 
             game_state.add_action(action_text, response)
@@ -97,14 +113,18 @@ Respond with a descriptive, atmospheric response (2-4 sentences) that follows th
     def _send_to_llm(self, prompt):
         if config.PREFERRED_LLM == "groq":
             if groq.is_available():
-                return groq.generate(prompt)
+                self._last_llm_used = "groq"
+                return groq.generate(prompt), "groq"
             elif ollama.is_available():
-                return ollama.generate(prompt)
+                self._last_llm_used = "ollama"
+                return ollama.generate(prompt), "ollama"
         else:
             if ollama.is_available():
-                return ollama.generate(prompt)
+                self._last_llm_used = "ollama"
+                return ollama.generate(prompt), "ollama"
             elif groq.is_available():
-                return groq.generate(prompt)
+                self._last_llm_used = "groq"
+                return groq.generate(prompt), "groq"
 
         raise RuntimeError("No LLM available")
 
@@ -193,3 +213,9 @@ Respond with a descriptive, atmospheric response (2-4 sentences) that follows th
 
     def set_active(self, active):
         self.active = active
+
+    def get_debug_info(self):
+        return {
+            "timing": self._last_llm_timing,
+            "llm_used": self._last_llm_used
+        }
