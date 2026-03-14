@@ -41,4 +41,5 @@ class GameState:
 
     def set_ending(self, ending):
         self.ending = ending
+        self.ending_triggered = True
         self.game_over = True
