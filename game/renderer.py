@@ -8,13 +8,22 @@ class Renderer:
         self.screen = screen
         self.font = pygame.font.Font(None, 20)
         self.sprite_loader = get_sprite_loader()
+        self.debug_overlay = False
+        self.debug_font = pygame.font.Font(None, 14)
 
     def render(self, game_state):
         self.screen.fill(config.BUS_FLOOR_COLOR)
         self._draw_bus_layout()
         self._draw_visual_states(game_state.world_changes)
         self._draw_ui(game_state)
+        
+        if self.debug_overlay:
+            self._draw_debug_overlay(game_state)
+        
         pygame.display.flip()
+
+    def toggle_debug_overlay(self):
+        self.debug_overlay = not self.debug_overlay
 
     def _draw_bus_layout(self):
         bus_rect = pygame.Rect(20, 30, 280, 180)
@@ -125,15 +134,17 @@ class Renderer:
         if not world_changes:
             return
         
-        for change_type, change_data in world_changes.items():
-            if change_type == "window_broken":
+        for change_key, change_data in world_changes.items():
+            if change_key.startswith("window_broken"):
                 self._draw_broken_window(change_data)
-            elif change_type == "blood_stain":
+            elif change_key.startswith("blood_stain"):
                 self._draw_blood_stain(change_data)
-            elif change_type == "item_moved":
+            elif change_key.startswith("item_moved"):
                 self._draw_item_moved(change_data)
-            elif change_type == "item_changed":
+            elif change_key.startswith("item_changed"):
                 self._draw_item_changed(change_data)
+            elif change_key.startswith("fire_on_bus"):
+                self._draw_fire(change_data)
 
     def _draw_broken_window(self, data):
         window_index = data.get("window_index", 0)
@@ -170,6 +181,17 @@ class Renderer:
 
     def _draw_item_changed(self, data):
         pass
+
+    def _draw_fire(self, data):
+        x = data.get("x", 0)
+        y = data.get("y", 0)
+        intensity = data.get("intensity", 1)
+        
+        fire_colors = [(255, 100, 0), (255, 50, 0), (200, 0, 0)]
+        for i, color in enumerate(fire_colors):
+            size = 15 - i * 3
+            offset_y = i * 5
+            pygame.draw.circle(self.screen, color, (x + 10, y + offset_y), size * intensity // 2)
 
     def _draw_ui(self, game_state):
         pygame.draw.rect(self.screen, config.UI_BG_COLOR, (0, 220, 320, 20))
@@ -224,3 +246,20 @@ class Renderer:
         restart_surface = self.font.render("Press R to restart", True, (150, 150, 150))
         restart_rect = restart_surface.get_rect(center=(160, 210))
         self.screen.blit(restart_surface, restart_rect)
+
+    def _draw_debug_overlay(self, game_state):
+        overlay_bg = pygame.Surface((150, 60))
+        overlay_bg.set_alpha(200)
+        overlay_bg.fill((0, 0, 0))
+        self.screen.blit(overlay_bg, (5, 5))
+        
+        debug_lines = [
+            f"DEBUG MODE",
+            f"Loop: #{game_state.loop_count}",
+            f"Minute: {game_state.current_minute}",
+            f"Actions: {len(game_state.actions_taken)}"
+        ]
+        
+        for i, line in enumerate(debug_lines):
+            text_surface = self.debug_font.render(line, True, (0, 255, 0))
+            self.screen.blit(text_surface, (10, 8 + i * 12))

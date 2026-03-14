@@ -1,5 +1,6 @@
 import pygame
 import config
+import time
 from llm import ollama, groq
 from game.lore_loader import get_lore_loader
 
@@ -14,6 +15,8 @@ class InputHandler:
         self.font = pygame.font.Font(None, 16)
         self.input_rect = pygame.Rect(10, 200, 240, 20)
         self.active = True
+        self._last_llm_timing = None
+        self._last_llm_used = None
 
     def handle_event(self, event, game_state, loop_manager):
         if not self.active or game_state.game_over:
@@ -38,10 +41,25 @@ class InputHandler:
 
         try:
             prompt = self._build_prompt(action_text, game_state)
-            response = self._send_to_llm(prompt)
+            
+            if config.DEBUG_MODE and config.LOG_PROMPTS:
+                print(f"\n=== DEBUG: PROMPT ===\n{prompt}\n")
+            
+            start_time = time.time()
+            response, llm_used = self._send_to_llm(prompt)
+            elapsed = time.time() - start_time
+            
+            self._last_llm_timing = elapsed
+            self._last_llm_used = llm_used
+            
+            if config.DEBUG_MODE:
+                print(f"\n=== DEBUG: LLM RESPONSE ===\nLLM Used: {llm_used}\nTime: {elapsed:.2f}s\nResponse: {response}\n")
+            
             self.response_text = response
 
             game_state.add_action(action_text, response)
+
+            self._parse_world_changes(action_text, response, game_state)
 
             should_reset = loop_manager.check_and_trigger_loop_reset(game_state)
             if not should_reset:
@@ -95,14 +113,18 @@ Respond with a descriptive, atmospheric response (2-4 sentences) that follows th
     def _send_to_llm(self, prompt):
         if config.PREFERRED_LLM == "groq":
             if groq.is_available():
-                return groq.generate(prompt)
+                self._last_llm_used = "groq"
+                return groq.generate(prompt), "groq"
             elif ollama.is_available():
-                return ollama.generate(prompt)
+                self._last_llm_used = "ollama"
+                return ollama.generate(prompt), "ollama"
         else:
             if ollama.is_available():
-                return ollama.generate(prompt)
+                self._last_llm_used = "ollama"
+                return ollama.generate(prompt), "ollama"
             elif groq.is_available():
-                return groq.generate(prompt)
+                self._last_llm_used = "groq"
+                return groq.generate(prompt), "groq"
 
         raise RuntimeError("No LLM available")
 
@@ -116,6 +138,39 @@ Respond with a descriptive, atmospheric response (2-4 sentences) that follows th
                 game_state.set_ending(ending)
                 self.response_text = ending.get("result", response)
                 break
+
+    def _parse_world_changes(self, action_text, response, game_state):
+        action_lower = action_text.lower()
+        response_lower = response.lower()
+        combined = action_lower + " " + response_lower
+
+        if "window" in combined and ("smash" in combined or "break" in combined or "shatter" in combined):
+            window_index = 0
+            if "right" in combined:
+                window_index = 2 if "front" in combined or "first" in combined else 3
+            else:
+                window_index = 0 if "front" in combined or "first" in combined else 1
+            game_state.world_changes[f"window_broken_{window_index}"] = {"window_index": window_index}
+
+        npc_names = {
+            "alex": ["alex", "boy", "teenager", "kid"],
+            "maria": ["maria", "woman", "girl"],
+            "emo": ["emo", "boy", "goth"],
+            "driver": ["driver", "driver_man"],
+        }
+
+        for npc_id, names in npc_names.items():
+            for name in names:
+                if name in combined and ("kill" in combined or "murder" in combined or "stab" in combined or "attack" in combined or "harm" in combined):
+                    game_state.world_changes[f"{npc_id}_dead"] = {"npc_id": npc_id, "x": 50 + hash(npc_id) % 200, "y": 100 + hash(npc_id) % 50}
+                    game_state.world_changes[f"blood_stain_{npc_id}"] = {"x": 50 + hash(npc_id) % 200, "y": 100 + hash(npc_id) % 50, "size": 25}
+                    break
+
+        if "fire" in combined or "burn" in combined:
+            game_state.world_changes["fire_on_bus"] = {"x": 150, "y": 100, "intensity": 1}
+
+        if "blood" in combined or "bleed" in combined:
+            game_state.world_changes["blood_stain_generic"] = {"x": 100, "y": 120, "size": 20}
 
     def render(self, game_state):
         pygame.draw.rect(self.screen, config.UI_BG_COLOR, self.input_rect)
@@ -158,3 +213,9 @@ Respond with a descriptive, atmospheric response (2-4 sentences) that follows th
 
     def set_active(self, active):
         self.active = active
+
+    def get_debug_info(self):
+        return {
+            "timing": self._last_llm_timing,
+            "llm_used": self._last_llm_used
+        }

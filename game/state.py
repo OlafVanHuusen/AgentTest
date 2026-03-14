@@ -7,6 +7,7 @@ class GameState:
         self.actions = []
         self.action_results = {}
         self.world_changes = {}
+        self.player_memory = []
         self.game_over = False
         self.ending_triggered = False
         self.ending = None
