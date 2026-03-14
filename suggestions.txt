@@ -4,14 +4,14 @@
 
 | Status | Count |
 |--------|-------|
-| Closed (GitHub) | 22 |
-| Open | 20 |
+| Closed (GitHub) | 24 |
+| Open | 19 |
 
-**Total Issues**: 42 (20 open + 22 closed)
+**Total Issues**: 43 (19 open + 24 closed)
 
 ## Current Status
 
-### Completed (Closed Issues - 22)
+### Completed (Closed Issues - 24)
 - Phase 1.1 – Project Setup
 - Phase 1.2 – Main Entry Point
 - Phase 1.4 – Lore Loading
@@ -33,7 +33,7 @@
 - [setup] Create project structure and config
 - Phase 1.3 – Game State
 
-### Open Issues (20)
+### Open Issues (19)
 | Issue # | Title | Notes |
 |---------|-------|-------|
 | 161 | Phase 1.3 – Game State | game/state.py exists |
