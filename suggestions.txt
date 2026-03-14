@@ -4,14 +4,14 @@
 
 | Status | Count |
 |--------|-------|
-| Closed (GitHub) | 24 |
+| Closed (GitHub) | 23 |
 | Open | 19 |
 
-**Total Issues**: 43 (19 open + 24 closed)
+**Total Issues**: 42 (19 open + 23 closed)
 
 ## Current Status
 
-### Completed (Closed Issues - 24)
+### Completed (Closed Issues - 23)
 - Phase 1.1 – Project Setup
 - Phase 1.2 – Main Entry Point
 - Phase 1.4 – Lore Loading
