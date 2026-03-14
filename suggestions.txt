@@ -11,7 +11,7 @@
 
 ## Current Status
 
-### Completed (Closed Issues - 20)
+### Completed (Closed Issues - 21)
 - Phase 1.1 – Project Setup
 - Phase 1.2 – Main Entry Point
 - Phase 1.4 – Lore Loading
@@ -33,7 +33,7 @@
 - [setup] Create project structure and config
 - Phase 1.3 – Game State
 
-### Open Issues (20)
+### Open Issues (21)
 | Issue # | Title |
 |---------|-------|
 | 161 | Phase 1.3 – Game State |
