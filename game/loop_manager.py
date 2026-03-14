@@ -3,8 +3,9 @@ import random
 
 
 class LoopManager:
-    def __init__(self, screen):
+    def __init__(self, screen, sound_manager=None):
         self.screen = screen
+        self.sound_manager = sound_manager
         self.effect_active = False
         self.effect_timer = 0
         self.effect_duration = 60
@@ -22,6 +23,8 @@ class LoopManager:
         self.effect_timer = 0
         self.effect_type = "loop_reset"
         self.original_surface = self.screen.copy()
+        if self.sound_manager:
+            self.sound_manager.play_sound('loop_reset')
 
     def update(self, game_state):
         if self.effect_active:

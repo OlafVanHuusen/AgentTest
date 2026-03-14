@@ -4,6 +4,7 @@ from game.state import GameState
 from game.renderer import Renderer
 from game.input_handler import InputHandler
 from game.loop_manager import LoopManager
+from assets.sound_manager import get_sound_manager
 
 
 def main():
@@ -17,10 +18,18 @@ def main():
     
     clock = pygame.time.Clock()
     
+    sound_manager = get_sound_manager()
+    sound_manager.load_sound('loop_reset', 'bus_engine.wav')
+    sound_manager.load_sound('thunder', 'thunder.wav')
+    sound_manager.load_music('ambient', 'ambient.wav')
+    
     game_state = GameState()
     renderer = Renderer(screen)
     input_handler = InputHandler(screen)
-    loop_manager = LoopManager(screen)
+    loop_manager = LoopManager(screen, sound_manager)
+    
+    if sound_manager.enabled:
+        sound_manager.play_music('ambient')
     
     running = True
     while running:
@@ -40,6 +49,7 @@ def main():
         
         clock.tick(60)
     
+    sound_manager.stop_music()
     pygame.quit()
 
 
