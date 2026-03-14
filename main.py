@@ -36,6 +36,9 @@ def main():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_F1:
+                    renderer.toggle_debug_overlay()
             else:
                 input_handler.handle_event(event, game_state, loop_manager)
         

@@ -8,13 +8,22 @@ class Renderer:
         self.screen = screen
         self.font = pygame.font.Font(None, 20)
         self.sprite_loader = get_sprite_loader()
+        self.debug_overlay = False
+        self.debug_font = pygame.font.Font(None, 14)
 
     def render(self, game_state):
         self.screen.fill(config.BUS_FLOOR_COLOR)
         self._draw_bus_layout()
         self._draw_visual_states(game_state.world_changes)
         self._draw_ui(game_state)
+        
+        if self.debug_overlay:
+            self._draw_debug_overlay(game_state)
+        
         pygame.display.flip()
+
+    def toggle_debug_overlay(self):
+        self.debug_overlay = not self.debug_overlay
 
     def _draw_bus_layout(self):
         bus_rect = pygame.Rect(20, 30, 280, 180)
@@ -195,3 +204,20 @@ class Renderer:
 
         self.screen.blit(time_surface, (5, 222))
         self.screen.blit(loop_surface, (250, 222))
+
+    def _draw_debug_overlay(self, game_state):
+        overlay_bg = pygame.Surface((150, 60))
+        overlay_bg.set_alpha(200)
+        overlay_bg.fill((0, 0, 0))
+        self.screen.blit(overlay_bg, (5, 5))
+        
+        debug_lines = [
+            f"DEBUG MODE",
+            f"Loop: #{game_state.loop_count}",
+            f"Minute: {game_state.current_minute}",
+            f"Actions: {len(game_state.actions_taken)}"
+        ]
+        
+        for i, line in enumerate(debug_lines):
+            text_surface = self.debug_font.render(line, True, (0, 255, 0))
+            self.screen.blit(text_surface, (10, 8 + i * 12))
