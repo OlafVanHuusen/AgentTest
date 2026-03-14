@@ -10,13 +10,20 @@ class InputHandler:
         self.screen = screen
         self.input_text = ""
         self.response_text = ""
+        self.displayed_text = ""
         self.is_processing = False
         self.lore_loader = get_lore_loader()
-        self.font = pygame.font.Font(None, 16)
+        self.font = pygame.font.Font(None, config.RESPONSE_BOX_FONT_SIZE)
+        self.input_font = pygame.font.Font(None, 16)
         self.input_rect = pygame.Rect(10, 200, 240, 20)
         self.active = True
         self._last_llm_timing = None
         self._last_llm_used = None
+        self._typing_timer = 0
+        self._typing_index = 0
+        self._scroll_offset = 0
+        self._thinking_animation_frame = 0
+        self._thinking_timer = 0
 
     def handle_event(self, event, game_state, loop_manager):
         if not self.active or game_state.game_over:
@@ -29,6 +36,11 @@ class InputHandler:
                 if self.input_text.strip():
                     self._process_input(game_state, loop_manager)
                     return True
+            elif event.key == pygame.K_UP:
+                self._scroll_offset = max(0, self._scroll_offset - 1)
+            elif event.key == pygame.K_DOWN:
+                max_scroll = max(0, len(self._get_wrapped_lines()) - config.RESPONSE_BOX_LINES)
+                self._scroll_offset = min(max_scroll, self._scroll_offset + 1)
             else:
                 if len(self.input_text) < 50:
                     self.input_text += event.unicode
@@ -38,6 +50,9 @@ class InputHandler:
         action_text = self.input_text.strip()
         self.input_text = ""
         self.is_processing = True
+        self._scroll_offset = 0
+        self._typing_index = 0
+        self.displayed_text = ""
 
         try:
             prompt = self._build_prompt(action_text, game_state)
@@ -177,19 +192,36 @@ Respond with a descriptive, atmospheric response (2-4 sentences) that follows th
         pygame.draw.rect(self.screen, config.UI_TEXT_COLOR, self.input_rect, 1)
 
         if self.is_processing:
-            input_surface = self.font.render("Processing...", True, config.UI_TEXT_COLOR)
+            self._render_thinking_indicator()
         else:
-            input_surface = self.font.render(self.input_text + "_", True, config.UI_TEXT_COLOR)
-        self.screen.blit(input_surface, (self.input_rect.x + 5, self.input_rect.y + 2))
+            input_surface = self.input_font.render(self.input_text + "_", True, config.UI_TEXT_COLOR)
+            self.screen.blit(input_surface, (self.input_rect.x + 5, self.input_rect.y + 2))
 
         if self.response_text:
+            self._update_typing_animation()
             self._render_response_box()
 
-    def _render_response_box(self):
-        box_rect = pygame.Rect(10, 60, 300, 80)
-        pygame.draw.rect(self.screen, config.BUS_WALL_COLOR, box_rect)
-        pygame.draw.rect(self.screen, config.UI_TEXT_COLOR, box_rect, 1)
+    def _render_thinking_indicator(self):
+        self._thinking_timer += 1
+        if self._thinking_timer >= 10:
+            self._thinking_timer = 0
+            self._thinking_animation_frame = (self._thinking_animation_frame + 1) % 3
 
+        thinking_frames = [".  ", ".. ", "..."]
+        frame_text = thinking_frames[self._thinking_animation_frame]
+        
+        input_surface = self.input_font.render(f"Thinking{frame_text}", True, config.UI_TEXT_COLOR)
+        self.screen.blit(input_surface, (self.input_rect.x + 5, self.input_rect.y + 2))
+
+    def _update_typing_animation(self):
+        if self._typing_index < len(self.response_text):
+            self._typing_timer += 1
+            if self._typing_timer >= config.TYPE_SPEED:
+                self._typing_timer = 0
+                self._typing_index += 1
+                self.displayed_text = self.response_text[:self._typing_index]
+
+    def _get_wrapped_lines(self):
         words = self.response_text.split()
         lines = []
         current_line = []
@@ -202,11 +234,49 @@ Respond with a descriptive, atmospheric response (2-4 sentences) that follows th
                 current_line = [word]
         if current_line:
             lines.append(" ".join(current_line))
+        return lines
 
-        for i, line in enumerate(lines[:4]):
-            if i < 4:
-                text_surface = self.font.render(line, True, config.UI_TEXT_COLOR)
-                self.screen.blit(text_surface, (15, 65 + i * 18))
+    def _render_response_box(self):
+        box_height = config.RESPONSE_BOX_LINES * config.RESPONSE_BOX_LINE_HEIGHT + 10
+        box_rect = pygame.Rect(10, 60, 300, box_height)
+        pygame.draw.rect(self.screen, config.BUS_WALL_COLOR, box_rect)
+        pygame.draw.rect(self.screen, config.UI_TEXT_COLOR, box_rect, 1)
+
+        lines = self._get_wrapped_lines()
+        display_text = self.displayed_text if self.displayed_text else self.response_text
+        
+        words = display_text.split()
+        display_lines = []
+        current_line = []
+        for word in words:
+            test_line = " ".join(current_line + [word])
+            if self.font.size(test_line)[0] < 280:
+                current_line.append(word)
+            else:
+                display_lines.append(" ".join(current_line))
+                current_line = [word]
+        if current_line:
+            display_lines.append(" ".join(current_line))
+
+        visible_lines = display_lines[self._scroll_offset:self._scroll_offset + config.RESPONSE_BOX_LINES]
+        
+        for i, line in enumerate(visible_lines):
+            text_surface = self.font.render(line, True, config.UI_TEXT_COLOR)
+            self.screen.blit(text_surface, (15, 65 + i * config.RESPONSE_BOX_LINE_HEIGHT))
+
+        if len(display_lines) > config.RESPONSE_BOX_LINES:
+            self._render_scroll_indicator(len(display_lines))
+
+    def _render_scroll_indicator(self, total_lines):
+        indicator_height = config.RESPONSE_BOX_LINE_HEIGHT
+        max_offset = total_lines - config.RESPONSE_BOX_LINES
+        indicator_pos = int((self._scroll_offset / max_offset) * (config.RESPONSE_BOX_LINES - 1)) if max_offset > 0 else 0
+        
+        for i in range(config.RESPONSE_BOX_LINES):
+            dot_x = 305
+            dot_y = 65 + i * config.RESPONSE_BOX_LINE_HEIGHT + 6
+            color = config.UI_TEXT_COLOR if i == indicator_pos else (80, 80, 80)
+            pygame.draw.circle(self.screen, color, (dot_x, dot_y), 2)
 
     def clear_response(self):
         self.response_text = ""
