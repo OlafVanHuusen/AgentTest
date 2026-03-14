@@ -5,9 +5,9 @@
 | Status | Count |
 |--------|-------|
 | Closed (GitHub) | 23 |
-| Open | 19 |
+| Open | 18 |
 
-**Total Issues**: 42 (19 open + 23 closed)
+**Total Issues**: 41 (18 open + 23 closed)
 
 ## Current Status
 
