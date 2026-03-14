@@ -205,9 +205,9 @@ Respond with a descriptive, atmospheric response (2-4 sentences) that follows th
         self._thinking_timer += 1
         if self._thinking_timer >= 10:
             self._thinking_timer = 0
-            self._thinking_animation_frame = (self._thinking_animation_frame + 1) % 3
+            self._thinking_animation_frame = (self._thinking_animation_frame + 1) % 4
 
-        thinking_frames = [".  ", ".. ", "..."]
+        thinking_frames = [".  ", ".. ", "...", "   "]
         frame_text = thinking_frames[self._thinking_animation_frame]
         
         input_surface = self.input_font.render(f"Thinking{frame_text}", True, config.UI_TEXT_COLOR)
