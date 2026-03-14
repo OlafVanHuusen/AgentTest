@@ -1,44 +1,61 @@
 import json
+import logging
 import os
 from pathlib import Path
+from typing import Optional, Union
+
+
+logger = logging.getLogger(__name__)
 
 
 class LoreLoader:
-    def __init__(self, lore_dir: str = None):
+    def __init__(self, lore_dir: Union[str, Path, None] = None):
         if lore_dir is None:
             base_dir = Path(__file__).parent.parent
             lore_dir = base_dir / "lore"
         self.lore_dir = Path(lore_dir)
-        self._npcs = None
-        self._setting = None
-        self._endings = None
+        self._npcs: Optional[dict] = None
+        self._setting: Optional[dict] = None
+        self._endings: Optional[dict] = None
+
+    def _load_json(self, filename: str) -> Optional[dict]:
+        path = self.lore_dir / filename
+        try:
+            with open(path, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except FileNotFoundError:
+            logger.warning(f"Lore file not found: {path}")
+            return None
+        except json.JSONDecodeError as e:
+            logger.error(f"Invalid JSON in {path}: {e}")
+            return None
 
     def load_npcs(self) -> dict:
         if self._npcs is None:
-            npcs_path = self.lore_dir / "npcs.json"
-            with open(npcs_path, "r", encoding="utf-8") as f:
-                self._npcs = json.load(f)
+            self._npcs = self._load_json("npcs.json")
+            if self._npcs is None:
+                self._npcs = {}
         return self._npcs
 
     def load_setting(self) -> dict:
         if self._setting is None:
-            setting_path = self.lore_dir / "setting.json"
-            with open(setting_path, "r", encoding="utf-8") as f:
-                self._setting = json.load(f)
+            self._setting = self._load_json("setting.json")
+            if self._setting is None:
+                self._setting = {}
         return self._setting
 
     def load_endings(self) -> dict:
         if self._endings is None:
-            endings_path = self.lore_dir / "endings.json"
-            with open(endings_path, "r", encoding="utf-8") as f:
-                self._endings = json.load(f)
+            self._endings = self._load_json("endings.json")
+            if self._endings is None:
+                self._endings = {}
         return self._endings
 
-    def get_npc(self, npc_id: str) -> dict:
+    def get_npc(self, npc_id: str) -> Optional[dict]:
         npcs = self.load_npcs()
         return npcs.get(npc_id)
 
-    def get_ending(self, ending_id: str) -> dict:
+    def get_ending(self, ending_id: str) -> Optional[dict]:
         endings = self.load_endings()
         return endings.get(ending_id)
 
