@@ -4,10 +4,10 @@
 
 | Status | Count |
 |--------|-------|
-| Closed (GitHub) | 21 |
-| Open | 21 |
+| Closed (GitHub) | 22 |
+| Open | 20 |
 
-**Total Issues**: 42 (21 open + 21 closed)
+**Total Issues**: 42 (20 open + 22 closed)
 
 ## Current Status
 
@@ -33,7 +33,7 @@
 - [setup] Create project structure and config
 - Phase 1.3 – Game State
 
-### Open Issues (21)
+### Open Issues (20)
 | Issue # | Title | Notes |
 |---------|-------|-------|
 | 161 | Phase 1.3 – Game State | game/state.py exists |
