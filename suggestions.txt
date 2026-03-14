@@ -5,9 +5,9 @@
 | Status | Count |
 |--------|-------|
 | Closed (GitHub) | 20 |
-| Open | 23 |
+| Open | 20 |
 
-**Total Issues**: 43 (23 open + 20 closed)
+**Total Issues**: 40 (20 open + 20 closed)
 
 ## Current Status
 
@@ -28,11 +28,12 @@
 - Phase 4.2 – Loop Manager
 - Phase 5.2 – Visual Feedback for Actions
 - Phase 5.4 – Ambient Sound (Optional)
+- Phase 5.3 – Debug Mode
 - [lore] Create npcs.json with detailed NPC definitions
 - [setup] Create project structure and config
-- Phase 1.3 – Game State (appears in both lists - verify status)
+- Phase 1.3 – Game State
 
-### Open Issues (23)
+### Open Issues (20)
 | Issue # | Title |
 |---------|-------|
 | 161 | Phase 1.3 – Game State |
@@ -125,8 +126,7 @@
 ## Technical Debt
 
 - Issues use inconsistent naming (Phase X vs [area] format)
-- Some Phase items may be completed but not closed
 - Need full integration testing
-- Verify Phase 1.3 status (appears in both open and closed lists)
+- Some Phase items may be completed but not closed
 
 (End of file)
