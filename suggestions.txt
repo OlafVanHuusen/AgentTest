@@ -4,14 +4,14 @@
 
 | Status | Count |
 |--------|-------|
-| Closed (GitHub) | 23 |
-| Open | 18 |
+| Closed (GitHub) | 26 |
+| Open | 17 |
 
-**Total Issues**: 41 (18 open + 23 closed)
+**Total Issues**: 43 (17 open + 26 closed)
 
 ## Current Status
 
-### Completed (Closed Issues - 23)
+### Completed (Closed Issues - 26)
 - Phase 1.1 – Project Setup
 - Phase 1.2 – Main Entry Point
 - Phase 1.4 – Lore Loading
@@ -32,32 +32,29 @@
 - [lore] Create npcs.json with detailed NPC definitions
 - [setup] Create project structure and config
 - Phase 1.3 – Game State
+- [lore] Implement lore loading system
+- [game] Implement game state management
+- [setup] Create config.py with game settings
+- [lore] Create endings.json with 3 endings
+- [lore] Create setting.json with bus atmosphere and rules
+- [game] Create main entry point with game loop
 
-### Open Issues (19)
+### Open Issues (17)
 | Issue # | Title | Notes |
 |---------|-------|-------|
-| 161 | Phase 1.3 – Game State | game/state.py exists |
+| 161 | Phase 1.3 – Game State | game/state.py exists - verify implementation |
 | 168 | Phase 2.5 – Font | |
-| 172 | Phase 3.4 – Failover Handler | llm/failover.py may exist |
-| 173 | Phase 3.5 – Prompt Builder | llm/prompt_builder.py may exist |
-| 174 | Phase 3.6 – Full Integration | |
+| 172 | Phase 3.4 – Failover Handler | llm/failover.py exists |
+| 173 | Phase 3.5 – Prompt Builder | llm/prompt_builder.py exists |
+| 174 | Phase 3.6 – Full Integration | Connect LLM to game |
 | 178 | Phase 4.3 – Action Tracker (Consistency) | game/action_tracker.py exists |
 | 179 | Phase 4.4 – Ending Detection | |
 | 180 | Phase 4.5 – Lightning Effect (LLM Failure) | |
-| 184 | Phase 5.3 – Debug Mode | |
 | 186 | Phase 5.5 – UI Polish | |
-| 187 | Phase 5.6 – Final Testing | |
-| 188 | Phase 6.1 – Pygbag Setup | |
 | 189 | Phase 6.2 – Web Build | |
 | 190 | Phase 6.3 – Testing | |
 | 191 | Phase 6.4 – Web-Specific Considerations | |
 | 192 | Phase 6.5 – Deployment (Optional) | |
-| 197 | [lore] Create setting.json with bus atmosphere and rules | lore/setting.json exists |
-| 198 | [lore] Create endings.json with 3 endings | lore/endings.json exists |
-| 199 | [setup] Create config.py with game settings | config.py exists |
-| 201 | [game] Create main entry point with game loop | main.py exists |
-| 202 | [game] Implement game state management | game/state.py exists |
-| 203 | [lore] Implement lore loading system | game/lore_loader.py exists |
 
 ## Code That Exists (Verified)
 
@@ -84,39 +81,45 @@
 - lore/npcs.json - 15 NPCs
 - lore/setting.json - Bus atmosphere
 
+**Assets:**
+- assets/sprites/ - NPC sprite modules (driver.py, maria.py, alex.py, emo_boy.py)
+- assets/sound_manager.py - Sound management
+- assets/generate_sounds.py - Sound generation utility
+
 **Tests:**
 - tests/llm_integration.py - LLM tests
+- tests/test_lore_loader.py - Lore loader tests
+- tests/test_final_testing.py - Final testing
 
 ## Suggested Next Priorities
 
-1. **Close Completed Issues** - Many code files exist but issues remain open
-   - Review #197, #198, #199, #201, #202, #203 - files exist, should close
-   - Review #161, #172, #173, #178 - check if implementation complete
+1. **Close Verified Issues** - Many code files exist but issues remain open
+   - Review #161, #172, #173, #178 - verify implementation complete, close if done
 
-2. **Phase 3.6 (Full Integration)** - Connect LLM to game
+2. **Phase 3.6 (Full Integration)** - HIGH PRIORITY
    - Wire prompt builder to LLM clients
    - Connect game actions to LLM queries
    - Test end-to-end LLM gameplay
 
 3. **Phase 4.x (Time Loop Mechanics)**
-   - Ending Detection
-   - Lightning Effect (LLM Failure)
+   - #179 - Ending Detection
+   - #180 - Lightning Effect (LLM Failure)
 
-4. **Phase 5 (Polish)** - After core mechanics work
-   - Pixel Art Sprites
-   - Visual Feedback
-   - Debug Mode
+4. **Phase 5 (Polish)**
+   - #186 - UI Polish
 
 5. **Phase 6 (Web)** - Optional deployment
+   - #189-192 - Web Build, Testing, Web-Specific, Deployment
 
 ## Identified Gaps
 
-1. **Stale open issues** - Multiple issues (#197-203, #161, #172, #173, #178) have code but remain open
-2. **No full LLM-game integration** - Phase 3.6 missing
-3. **Limited tests** - Only LLM integration test exists
-4. **No audio** - Ambient sound (optional) not implemented
-5. **No pixel art** - Sprites not created (optional)
-6. **No debug mode** - Phase 5.3 not fully implemented
+1. **Stale open issues** - Multiple issues have code but remain open (#161, #172, #173, #178)
+2. **No full LLM-game integration** - Phase 3.6 (#174) missing - critical
+3. **Limited tests** - Only basic tests exist, more needed
+4. **No font** - Phase 2.5 (#168) not addressed
+5. **No ending detection** - #179 not implemented
+6. **No lightning effect** - #180 not implemented
+7. **No UI polish** - #186 not implemented
 
 ## Ideas for New Features
 
@@ -132,5 +135,6 @@
 - Issues use inconsistent naming (Phase X vs [area] format)
 - Need full integration testing
 - Multiple Phase items should be closed but remain open
+- Consider adding more comprehensive test coverage
 
 (End of file)
