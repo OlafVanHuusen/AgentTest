@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Timeloop Bus</title>
+    <style>
+        body { background: #111; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        canvas { image-rendering: pixelated; }
+    </style>
+</head>
+<body>
+    <script src="https://pygame-web.github.io/pygbag/pygbag.js"></script>
+    <script>
+        pyag = window.pygameweb
+        pyag.init('main.py', { 
+            focus: true,
+            async: true,
+            canvas: document.getElementById('canvas')
+        })
+    </script>
+    <canvas id="canvas" width="960" height="720"></canvas>
+</body>
+</html>

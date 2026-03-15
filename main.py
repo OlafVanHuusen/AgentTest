@@ -3,37 +3,15 @@ import pygame
 import config
 from game.state import GameState
 from game.renderer import Renderer
-from llm import ollama, groq
+from game.input_handler import InputHandler
+from game.loop_manager import LoopManager
+from assets.sound_manager import get_sound_manager
 
 logging.basicConfig(
     level=logging.DEBUG if config.DEBUG_MODE else logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s'
 )
 logger = logging.getLogger(__name__)
-
-
-def generate_with_failover(prompt: str) -> str | None:
-    error_msg = None
-    
-    if config.PREFERRED_LLM == "ollama" or config.PREFERRED_LLM == "auto":
-        try:
-            if ollama.is_available():
-                logger.debug("Using Ollama for generation")
-                return ollama.generate(prompt)
-        except Exception as e:
-            logger.warning(f"Ollama failed: {e}")
-            error_msg = str(e)
-    
-    try:
-        if groq.is_available():
-            logger.debug("Falling back to Groq")
-            return groq.generate(prompt)
-    except Exception as e:
-        logger.warning(f"Groq failed: {e}")
-        error_msg = str(e)
-    
-    logger.error(f"Both LLM providers failed. Last error: {error_msg}")
-    return None
 
 
 def main():
@@ -45,11 +23,20 @@ def main():
     screen = pygame.display.set_mode((scaled_width, scaled_height))
     pygame.display.set_caption("Timeloop Bus")
     
+    clock = pygame.time.Clock()
+    
+    sound_manager = get_sound_manager()
+    sound_manager.load_sound('loop_reset', 'bus_engine.wav')
+    sound_manager.load_sound('thunder', 'thunder.wav')
+    sound_manager.load_music('ambient', 'ambient.wav')
+    
     game_state = GameState()
     renderer = Renderer(screen)
+    input_handler = InputHandler(screen)
+    loop_manager = LoopManager(screen, sound_manager)
     
-    user_input = ""
-    dialogue_text = "Type your action and press ENTER..."
+    if sound_manager.enabled:
+        sound_manager.play_music('ambient')
     
     running = True
     while running:
@@ -57,36 +44,27 @@ def main():
             if event.type == pygame.QUIT:
                 running = False
             elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_BACKSPACE:
-                    user_input = user_input[:-1]
-                elif event.key == pygame.K_RETURN:
-                    if user_input.strip():
-                        action = user_input.strip()
-                        dialogue_text = f"You: {action}"
-                        
-                        result = generate_with_failover(f"Player action: {action}")
-                        
-                        if result is None:
-                            logger.warning("LLM failure detected, triggering lightning effect")
-                            renderer.trigger_lightning_effect()
-                            dialogue_text = "The time loop collapses... Everything goes white."
-                            renderer.render(game_state, "", dialogue_text)
-                            pygame.time.wait(1500)
-                            game_state.reset_loop()
-                            dialogue_text = "The bus driver looks at you. It's 2:00 AM. Again."
-                        else:
-                            dialogue_text = result
-                            game_state.add_action(action, result)
-                            game_state.advance_time()
-                        
-                        user_input = ""
-                else:
-                    if len(user_input) < 40:
-                        user_input += event.unicode
+                if event.key == pygame.K_F1:
+                    renderer.toggle_debug_overlay()
+            else:
+                input_handler.handle_event(event, game_state, loop_manager)
         
-        renderer.render(game_state, user_input, dialogue_text)
-        pygame.time.wait(100)
+        if hasattr(game_state, 'llm_failed') and game_state.llm_failed:
+            game_state.llm_failed = False
+            renderer.trigger_lightning_effect()
+            loop_manager.trigger_loop_reset(game_state)
+        
+        loop_manager.update(game_state)
+        
+        renderer.render(game_state)
+        input_handler.render(game_state)
+        
+        if loop_manager.is_effect_active():
+            loop_manager.render_effect()
+        
+        clock.tick(60)
     
+    sound_manager.stop_music()
     pygame.quit()
 
 

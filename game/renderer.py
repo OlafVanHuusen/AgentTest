@@ -11,15 +11,22 @@ class Renderer:
         self.cursor_visible = True
         self.last_cursor_toggle = pygame.time.get_ticks()
         self.sprite_loader = get_sprite_loader()
+        self.debug_overlay = False
+        self.debug_font = pygame.font.Font(None, 14)
 
-    def render(self, game_state, user_input="", dialogue_text=""):
+    def render(self, game_state):
         self.screen.fill(config.BUS_FLOOR_COLOR)
         self._draw_bus_layout()
+        self._draw_visual_states(game_state.world_changes)
         self._draw_ui(game_state)
-        self._draw_action_counter(game_state)
-        self._draw_dialogue_box(dialogue_text)
-        self._draw_input_box(user_input)
+        
+        if self.debug_overlay:
+            self._draw_debug_overlay(game_state)
+        
         pygame.display.flip()
+
+    def toggle_debug_overlay(self):
+        self.debug_overlay = not self.debug_overlay
 
     def _draw_bus_layout(self):
         bus_rect = pygame.Rect(20, 30, 280, 180)
@@ -126,6 +133,69 @@ class Renderer:
         handle_y = door_y + 15
         pygame.draw.rect(self.screen, config.DOOR_HANDLE_COLOR, (handle_x, handle_y, 3, 6))
 
+    def _draw_visual_states(self, world_changes):
+        if not world_changes:
+            return
+        
+        for change_key, change_data in world_changes.items():
+            if change_key.startswith("window_broken"):
+                self._draw_broken_window(change_data)
+            elif change_key.startswith("blood_stain"):
+                self._draw_blood_stain(change_data)
+            elif change_key.startswith("item_moved"):
+                self._draw_item_moved(change_data)
+            elif change_key.startswith("item_changed"):
+                self._draw_item_changed(change_data)
+            elif change_key.startswith("fire_on_bus"):
+                self._draw_fire(change_data)
+
+    def _draw_broken_window(self, data):
+        window_index = data.get("window_index", 0)
+        window_positions = {
+            0: (30, 75),
+            1: (75, 75),
+            2: (205, 75),
+            3: (250, 75),
+        }
+        wx, wy = window_positions.get(window_index, (30, 75))
+        
+        pygame.draw.rect(self.screen, config.BROKEN_WINDOW_COLOR, (wx, wy, 35, 45))
+        pygame.draw.rect(self.screen, config.BUS_WALL_COLOR, (wx, wy, 35, 45), 1)
+        
+        crack_lines = [
+            ((wx + 5, wy + 5), (wx + 20, wy + 25)),
+            ((wx + 20, wy + 25), (wx + 30, wy + 10)),
+            ((wx + 10, wy + 30), (wx + 25, wy + 40)),
+        ]
+        for start, end in crack_lines:
+            pygame.draw.line(self.screen, config.CRACK_COLOR, start, end, 1)
+
+    def _draw_blood_stain(self, data):
+        x = data.get("x", 0)
+        y = data.get("y", 0)
+        size = data.get("size", 20)
+        
+        stain_surface = pygame.Surface((size, size), pygame.SRCALPHA)
+        pygame.draw.circle(stain_surface, (*config.BLOOD_STAIN_COLOR, config.BLOOD_STAIN_ALPHA), (size // 2, size // 2), size // 2)
+        self.screen.blit(stain_surface, (x, y))
+
+    def _draw_item_moved(self, data):
+        pass
+
+    def _draw_item_changed(self, data):
+        pass
+
+    def _draw_fire(self, data):
+        x = data.get("x", 0)
+        y = data.get("y", 0)
+        intensity = data.get("intensity", 1)
+        
+        fire_colors = [(255, 100, 0), (255, 50, 0), (200, 0, 0)]
+        for i, color in enumerate(fire_colors):
+            size = 15 - i * 3
+            offset_y = i * 5
+            pygame.draw.circle(self.screen, color, (x + 10, y + offset_y), size * intensity // 2)
+
     def _draw_ui(self, game_state):
         pygame.draw.rect(self.screen, config.UI_BG_COLOR, (0, 220, 320, 20))
 
@@ -195,3 +265,20 @@ class Renderer:
             self.screen.fill(config.BUS_FLOOR_COLOR)
             pygame.display.flip()
             pygame.time.wait(50)
+
+    def _draw_debug_overlay(self, game_state):
+        overlay_bg = pygame.Surface((150, 60))
+        overlay_bg.set_alpha(200)
+        overlay_bg.fill((0, 0, 0))
+        self.screen.blit(overlay_bg, (5, 5))
+        
+        debug_lines = [
+            f"DEBUG MODE",
+            f"Loop: #{game_state.loop_count}",
+            f"Minute: {game_state.current_minute}",
+            f"Actions: {len(game_state.actions_taken)}"
+        ]
+        
+        for i, line in enumerate(debug_lines):
+            text_surface = self.debug_font.render(line, True, (0, 255, 0))
+            self.screen.blit(text_surface, (10, 8 + i * 12))

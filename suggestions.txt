@@ -4,144 +4,140 @@
 
 | Status | Count |
 |--------|-------|
-| Closed (GitHub) | 10 |
-| Open | 32 |
+| Closed (GitHub) | 28 |
+| Open | 16 |
 
-**Total Issues**: 42
+**Total Issues**: 44 (16 open + 28 closed)
 
-## Verified Implementation Status
+## Current Status
 
-### Completed (Verified in Code)
+### Completed (Closed Issues - 28)
+- Phase 1.1 – Project Setup
+- Phase 1.2 – Main Entry Point
+- Phase 1.4 – Lore Loading
+- Phase 1.5 – Basic Renderer (Placeholder)
+- Phase 2.1 – Bus Interior
+- Phase 2.2 – NPCs
+- Phase 2.3 – UI Elements
+- Phase 2.4 – Visual States
+- Phase 3.1 – LLM Base Interface
+- Phase 3.2 – Ollama Client
+- Phase 3.3 – Groq API Client
+- Phase 3.7 – Testing
+- Phase 4.1 – Time System
+- Phase 4.2 – Loop Manager
+- Phase 5.2 – Visual Feedback for Actions
+- Phase 5.4 – Ambient Sound (Optional)
+- Phase 5.3 – Debug Mode
+- [lore] Create npcs.json with detailed NPC definitions
+- [setup] Create project structure and config
+- Phase 1.3 – Game State
+- [lore] Implement lore loading system
+- [game] Implement game state management
+- [setup] Create config.py with game settings
+- [lore] Create endings.json with 3 endings
+- [lore] Create setting.json with bus atmosphere and rules
+- [game] Create main entry point with game loop
 
-| Issue # | Title | Status |
-|---------|-------|--------|
-| 199 | [setup] Create config.py with game settings | ✅ DONE |
-| 200 | [setup] Create project structure and config | ✅ DONE |
-| 197 | [lore] Create setting.json with bus atmosphere and rules | ✅ DONE |
-| 198 | [lore] Create endings.json with 3 endings | ✅ DONE |
-| 196 | [lore] Create npcs.json with detailed NPC definitions | ✅ DONE |
-| 203 | [lore] Implement lore loading system | ✅ DONE (lore_loader.py) |
-| 202 | [game] Implement game state management | ✅ DONE (state.py) |
-| 201 | [game] Create main entry point with game loop | ✅ DONE (main.py) |
-| 176 | Phase 4.1 – Time System | ✅ DONE (clock.py) |
-| 169 | Phase 3.1 – LLM Base Interface | ✅ DONE |
+### Open Issues (16)
+| Issue # | Title | Notes |
+|---------|-------|-------|
+| 161 | Phase 1.3 – Game State | game/state.py exists - verify implementation |
+| 168 | Phase 2.5 – Font | |
+| 172 | Phase 3.4 – Failover Handler | llm/failover.py exists |
+| 173 | Phase 3.5 – Prompt Builder | llm/prompt_builder.py exists |
+| 174 | Phase 3.6 – Full Integration | Connect LLM to game |
+| 178 | Phase 4.3 – Action Tracker (Consistency) | game/action_tracker.py exists |
+| 179 | Phase 4.4 – Ending Detection | |
+| 180 | Phase 4.5 – Lightning Effect (LLM Failure) | |
+| 186 | Phase 5.5 – UI Polish | |
+| 189 | Phase 6.2 – Web Build | |
+| 190 | Phase 6.3 – Testing | |
+| 191 | Phase 6.4 – Web-Specific Considerations | |
+| 192 | Phase 6.5 – Deployment (Optional) | |
+| 197 | [lore] Create setting.json with bus atmosphere and rules | |
+| 198 | [lore] Create endings.json with 3 endings | |
+| 199 | [setup] Create config.py with game settings | |
 
-### Remaining Open Issues (32 total)
-
-| Issue # | Title |
-|---------|-------|
-| 159 | Phase 1.1 – Project Setup |
-| 160 | Phase 1.2 – Main Entry Point |
-| 161 | Phase 1.3 – Game State |
-| 162 | Phase 1.4 – Lore Loading |
-| 163 | Phase 1.5 – Basic Renderer (Placeholder) |
-| 164 | Phase 2.1 – Bus Interior |
-| 165 | Phase 2.2 – NPCs |
-| 166 | Phase 2.3 – UI Elements |
-| 167 | Phase 2.4 – Visual States |
-| 168 | Phase 2.5 – Font |
-| 170 | Phase 3.2 – Ollama Client |
-| 171 | Phase 3.3 – Groq API Client |
-| 172 | Phase 3.4 – Failover Handler |
-| 173 | Phase 3.5 – Prompt Builder |
-| 174 | Phase 3.6 – Full Integration |
-| 175 | Phase 3.7 – Testing |
-| 177 | Phase 4.2 – Loop Manager |
-| 178 | Phase 4.3 – Action Tracker (Consistency) |
-| 179 | Phase 4.4 – Ending Detection |
-| 180 | Phase 4.5 – Lightning Effect (LLM Failure) |
-| 181 | Phase 4.6 – Input Handler Integration |
-| 182 | Phase 5.1 – Pixel Art Sprites |
-| 183 | Phase 5.2 – Visual Feedback for Actions |
-| 184 | Phase 5.3 – Debug Mode |
-| 185 | Phase 5.4 – Ambient Sound (Optional) |
-| 186 | Phase 5.5 – UI Polish |
-| 187 | Phase 5.6 – Final Testing |
-| 188 | Phase 6.1 – Pygbag Setup |
-| 189 | Phase 6.2 – Web Build |
-| 190 | Phase 6.3 – Testing |
-| 191 | Phase 6.4 – Web-Specific Considerations |
-| 192 | Phase 6.5 – Deployment (Optional) |
-
-## Implemented Code (Verified)
+## Code That Exists (Verified)
 
 **Core:**
-- config.py - Game settings (SCREEN, LLM, colors)
+- config.py - Game settings
 - main.py - Entry point with game loop
-- game/state.py - GameState class with loop_count, actions, endings
+- game/state.py - GameState class
 - game/lore_loader.py - Lore loading system
 - game/clock.py - Time advancement
-- game/renderer.py - Basic renderer stub
+- game/renderer.py - Full renderer implementation
+- game/action_tracker.py - Action tracking for consistency
+- game/loop_manager.py - Time loop management
+- game/input_handler.py - Input handling
 
 **LLM:**
 - llm/base.py - LLM base interface
 - llm/groq.py - Groq API client
 - llm/ollama.py - Ollama API client
+- llm/failover.py - Failover handler
+- llm/prompt_builder.py - Prompt builder
 
 **Lore:**
-- lore/endings.json - 3 endings defined
-- lore/npcs.json - 15 NPC definitions
-- lore/setting.json - Bus atmosphere and rules
+- lore/endings.json - 3 endings
+- lore/npcs.json - 15 NPCs
+- lore/setting.json - Bus atmosphere
+
+**Assets:**
+- assets/sprites/ - NPC sprite modules (driver.py, maria.py, alex.py, emo_boy.py)
+- assets/sound_manager.py - Sound management
+- assets/generate_sounds.py - Sound generation utility
 
 **Tests:**
-- tests/test_llm_integration.py - LLM integration tests
+- tests/llm_integration.py - LLM tests
+- tests/test_lore_loader.py - Lore loader tests
+- tests/test_final_testing.py - Final testing
 
 ## Suggested Next Priorities
 
-1. **Phase 2 (Visuals)** - Start with #164 Bus Interior
-   - Phase 2.1 → 2.2 → 2.3 → 2.4 → 2.5
-   - This is foundational before polish
+1. **Close Verified Issues** - Many code files exist but issues remain open
+   - Review #161, #172, #173, #178 - verify implementation complete, close if done
 
-2. **Phase 3.4-3.7 (LLM Integration)** 
-   - Failover Handler, Prompt Builder, Full Integration
-   - Connect LLM to game state
+2. **Phase 3.6 (Full Integration)** - HIGH PRIORITY
+   - Wire prompt builder to LLM clients
+   - Connect game actions to LLM queries
+   - Test end-to-end LLM gameplay
 
-3. **Phase 4 (Time Loop)** - Core mechanic
-   - Loop Manager, Action Tracker, Ending Detection
-   - Lightning Effect on LLM failure
+3. **Phase 4.x (Time Loop Mechanics)**
+   - #179 - Ending Detection
+   - #180 - Lightning Effect (LLM Failure)
 
-4. **Phase 5 (Polish)** - After core is working
+4. **Phase 5 (Polish)**
+   - #186 - UI Polish
 
 5. **Phase 6 (Web)** - Optional deployment
+   - #189-192 - Web Build, Testing, Web-Specific, Deployment
 
 ## Identified Gaps
 
-1. **Renderer is placeholder** - game/renderer.py is stub only
-2. **No input handler** - Phase 4.6 not started
-3. **No prompt builder** - Phase 3.5 missing
-4. **No failover handler** - Phase 3.4 missing
-5. **No full LLM-game integration** - Phase 3.6 missing
-6. **No pixel art sprites** - Phase 5.1 not implemented
-7. **No visual feedback** - Phase 5.2 not implemented
-8. **Limited tests** - Only LLM integration test exists
-9. **No audio** - Phase 5.4 optional but unimplemented
+1. **Stale open issues** - Multiple issues have code but remain open (#161, #172, #173, #178)
+2. **No full LLM-game integration** - Phase 3.6 (#174) missing - critical
+3. **Limited tests** - Only basic tests exist, more needed
+4. **No font** - Phase 2.5 (#168) not addressed
+5. **No ending detection** - #179 not implemented
+6. **No lightning effect** - #180 not implemented
+7. **No UI polish** - #186 not implemented
 
 ## Ideas for New Features
 
-1. Multiple Routes - Branching narrative beyond 3 endings
-2. Achievement System - Track discoveries and loop counts
-3. Speedrun Timer - Fastest escape tracking
-4. More LLM Models - Claude, GPT support
-5. Save/Load System - Persist progress
-6. Commentary Mode - LLM narrates player actions
+1. Achievement System - Track discoveries and loop counts
+2. Speedrun Timer - Fastest escape tracking
+3. More LLM Models - Claude, GPT support
+4. Save/Load System - Persist progress
+5. Commentary Mode - LLM narrates player actions
+6. Random Events - Time anomalies, special NPCs
 
 ## Technical Debt
 
-- DEBUG_MODE = True in config - should be environment-based
-- Hardcoded model names (llama3.2:7b) - should be configurable
-- No retry logic for LLM API calls
-- Renderer stub needs full implementation
 - Issues use inconsistent naming (Phase X vs [area] format)
+- Need full integration testing
+- Multiple Phase items should be closed but remain open
+- Consider adding more comprehensive test coverage
 
-## Progress by Category
-
-| Category | Completed | Remaining |
-|----------|-----------|-----------|
-| Setup | 2 | 2 |
-| Lore | 5 | 0 |
-| Game | 3 | 2 |
-| LLM | 1 | 6 |
-| Visuals | 0 | 5 |
-| Time Loop | 1 | 5 |
-| Polish | 0 | 5 |
-| Web | 0 | 5 |
+(End of file)
