@@ -11,6 +11,7 @@ class GameState:
         self.game_over = False
         self.ending_triggered = False
         self.ending = None
+        self.llm_failed = False
 
     def advance_time(self):
         self.current_minute += 1

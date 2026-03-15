@@ -1,3 +1,4 @@
+import logging
 import pygame
 import config
 from game.state import GameState
@@ -5,6 +6,12 @@ from game.renderer import Renderer
 from game.input_handler import InputHandler
 from game.loop_manager import LoopManager
 from assets.sound_manager import get_sound_manager
+
+logging.basicConfig(
+    level=logging.DEBUG if config.DEBUG_MODE else logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
 
 
 def main():
@@ -41,6 +48,11 @@ def main():
                     renderer.toggle_debug_overlay()
             else:
                 input_handler.handle_event(event, game_state, loop_manager)
+        
+        if hasattr(game_state, 'llm_failed') and game_state.llm_failed:
+            game_state.llm_failed = False
+            renderer.trigger_lightning_effect()
+            loop_manager.trigger_loop_reset(game_state)
         
         loop_manager.update(game_state)
         

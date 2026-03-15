@@ -68,7 +68,13 @@ class InputHandler:
             self._check_for_endings(action_text, response, game_state)
 
         except Exception as e:
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.error(f"LLM failure: {str(e)}")
             self.response_text = f"Error: {str(e)}"
+            
+            if "No LLM available" in str(e):
+                game_state.llm_failed = True
         finally:
             self.is_processing = False
 
